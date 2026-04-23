@@ -567,8 +567,7 @@
 
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1"></script>
+ 
   <script>
     const photoCameraInput = document.getElementById('photoCamera');
     const photoLibraryInput = document.getElementById('photoLibrary');
@@ -746,24 +745,31 @@
       });
     });
 
+   
     analyzeBtn.addEventListener('click', async () => {
-      if (!imageLoaded) { statusEl.textContent = '⚠️ Valitse ensin kuva.'; return; }
-      try {
-        const model = await ensureModel();
-        statusEl.textContent = '🔍 Analysoidaan...';
-        const preds = await model.classify(preview, 4);
-        renderTags(preds);
-        currentSuggestion = buildSuggestion(preds);
-        analysisSummary.textContent = `Ehdotus: ${currentSuggestion}`;
-        analysisSummary.className = 'found';
-        statusEl.textContent = '✓ Analyysi valmis.';
-        updateSteps(2);
-      } catch (err) {
-        console.error(err);
-        statusEl.textContent = '⚠️ Analyysi epäonnistui.';
-        analysisSummary.textContent = 'Tunnistus ei onnistunut. Voit kirjoittaa sisällön käsin.';
-      }
+  if (!imageLoaded) { statusEl.textContent = '⚠️ Valitse ensin kuva.'; return; }
+  try {
+    statusEl.textContent = '🔍 Analysoidaan kuvaa...';
+    const response = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: preview.src })
     });
+    const data = await response.json();
+    if (data.result) {
+      currentSuggestion = data.result;
+      analysisSummary.textContent = `Ehdotus: ${data.result}`;
+      analysisSummary.className = 'found';
+      statusEl.textContent = '✓ Analyysi valmis.';
+      updateSteps(2);
+    } else {
+      statusEl.textContent = '⚠️ Analyysi epäonnistui.';
+    }
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = '⚠️ Analyysi epäonnistui.';
+  }
+});
 
     useSuggestionBtn.addEventListener('click', () => {
       if (!currentSuggestion) { statusEl.textContent = '⚠️ Analysoi kuva ensin.'; return; }
