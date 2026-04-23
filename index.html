@@ -697,31 +697,11 @@
       return '🍽 Runsas ateria.';
     }
 
-    function renderTags(preds) {
-      analysisTags.innerHTML = '';
-      preds.forEach(p => {
-        const s = document.createElement('span');
-        s.className = 'tag';
-        s.textContent = `${p.className} ${Math.round(p.probability * 100)}%`;
-        analysisTags.appendChild(s);
-      });
-    }
+    
 
-    function buildSuggestion(preds) {
-      const labels = preds.map(p => p.className.toLowerCase());
-      for (const g of foodGuesses) {
-        if (g.terms.some(t => labels.some(l => l.includes(t)))) return g.suggestion;
-      }
-      return 'kana 150 g, riisi 150 g, salaatti 100 g';
-    }
+    
 
-    async function ensureModel() {
-      if (mobileNetModel) return mobileNetModel;
-      statusEl.textContent = '⏳ Ladataan mallia...';
-      mobileNetModel = await mobilenet.load();
-      statusEl.textContent = '✓ Malli valmis.';
-      return mobileNetModel;
-    }
+    
 
     function handleSelectedFile(file) {
       if (!file) return;
