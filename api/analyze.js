@@ -21,7 +21,7 @@ export default async function handler(req, res) {
           contents: [{
             parts: [
               {
-                text: 'Analysoi tämä ruoka-annos. Listaa kaikki tunnistamasi ruoka-aineet pilkuilla erotettuna suomeksi ja arvio niiden määrä grammoina tai kappalemäärinä. Esimerkki: kana 150 g, riisi 200 g, salaatti 80 g. Vastaa VAIN listalla, ei muuta tekstiä.'
+                text: 'Analysoi tämä ruoka-annos suomeksi. Listaa kaikki tunnistamasi ruoka-aineet ja arvioi niiden kalorimäärä. Vastaa VAIN tässä muodossa, yksi rivi per ruoka-aine: "ruoka määrä g: X kcal". Esimerkki: kana 150 g: 248 kcal. Ei muuta tekstiä, ei selityksiä.'
               },
               {
                 inline_data: {
