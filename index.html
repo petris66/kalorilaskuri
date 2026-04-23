@@ -20,6 +20,8 @@
       --border: #e5e7eb;
       --accent: #2563eb;
       --accent-text: #ffffff;
+      --soft: #eef2ff;
+      --success: #047857;
     }
 
     * { box-sizing: border-box; }
@@ -32,7 +34,7 @@
     }
 
     .wrap {
-      max-width: 760px;
+      max-width: 780px;
       margin: 0 auto;
       padding: 16px;
     }
@@ -42,29 +44,21 @@
       border: 1px solid var(--border);
       border-radius: 18px;
       padding: 16px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+      box-shadow: 0 8px 22px rgba(0,0,0,0.05);
       margin-bottom: 16px;
     }
 
-    h1, h2 {
-      margin-top: 0;
-    }
-
-    p {
-      line-height: 1.45;
-    }
-
-    .muted {
-      color: var(--muted);
-    }
+    h1, h2, h3 { margin-top: 0; }
+    p { line-height: 1.45; }
+    .muted { color: var(--muted); }
 
     label {
       display: block;
-      font-weight: 600;
+      font-weight: 700;
       margin-bottom: 8px;
     }
 
-    input[type="file"], textarea, input[type="number"] {
+    input[type="file"], textarea, input[type="number"], select {
       width: 100%;
       padding: 12px;
       border: 1px solid var(--border);
@@ -96,7 +90,7 @@
       border-radius: 12px;
       padding: 12px 16px;
       font-size: 16px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
     }
 
@@ -106,23 +100,29 @@
     }
 
     .secondary {
-      background: #eef2ff;
+      background: var(--soft);
       color: #1e3a8a;
+    }
+
+    .ghost {
+      background: #f3f4f6;
+      color: #111827;
     }
 
     .preview {
       width: 100%;
-      max-height: 340px;
+      max-height: 360px;
       object-fit: cover;
       border-radius: 14px;
       border: 1px solid var(--border);
       display: none;
       margin-top: 12px;
+      background: #fff;
     }
 
     .result {
-      font-size: 18px;
-      font-weight: 700;
+      font-size: 20px;
+      font-weight: 800;
       margin-top: 8px;
     }
 
@@ -142,10 +142,34 @@
       cursor: pointer;
     }
 
+    .analysisBox {
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fafafa;
+    }
+
+    .tag {
+      display: inline-block;
+      background: #ecfeff;
+      color: #155e75;
+      border: 1px solid #bae6fd;
+      border-radius: 999px;
+      padding: 6px 10px;
+      margin: 4px 6px 0 0;
+      font-size: 14px;
+    }
+
+    .status {
+      font-size: 14px;
+      color: var(--success);
+      font-weight: 700;
+      margin-top: 8px;
+      min-height: 20px;
+    }
+
     @media (max-width: 640px) {
-      .row {
-        grid-template-columns: 1fr;
-      }
+      .row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -153,22 +177,36 @@
   <main class="wrap">
     <section class="card">
       <h1>Kalorilaskuri</h1>
-      <p class="muted">Valitse kuva ruoka-annoksesta, kirjoita mitä lautasella on, ja sovellus antaa karkean kalorion arvion.</p>
+      <p class="muted">Tämä versio on aiempaa automaattisempi: voit valita kuvan, antaa sovelluksen yrittää tunnistaa sisältöä ja käyttää ehdotusta kalorilaskennan pohjana.</p>
     </section>
 
     <section class="card">
-      <label for="photo">1. Valitse kuva</label>
+      <label for="photo">1. Valitse tai ota kuva</label>
       <input id="photo" type="file" accept="image/*" capture="environment" />
       <img id="preview" class="preview" alt="Kuvan esikatselu" />
+      <div class="buttons">
+        <button id="analyzeBtn" class="primary" type="button">Analysoi kuva</button>
+        <button id="useSuggestionBtn" class="secondary" type="button">Käytä ehdotusta</button>
+      </div>
+      <div id="status" class="status"></div>
     </section>
 
     <section class="card">
-      <label for="foods">2. Kirjoita mitä lautasella on</label>
+      <h2>Automaattinen ehdotus</h2>
+      <div class="analysisBox">
+        <p id="analysisSummary" class="muted">Ei vielä analysoitu.</p>
+        <div id="analysisTags"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <label for="foods">2. Tarkista tai muokkaa ruokalista</label>
       <textarea id="foods" placeholder="Esim. kana 150 g, riisi 200 g, salaatti, kastike 2 rkl"></textarea>
       <div>
         <span class="pill" data-fill="kana 150 g, riisi 200 g, salaatti">Kana + riisi</span>
         <span class="pill" data-fill="lohi 180 g, peruna 250 g, vihannekset">Lohi + peruna</span>
         <span class="pill" data-fill="jauheliha 150 g, pasta 220 g, tomaattikastike">Pasta-annos</span>
+        <span class="pill" data-fill="pizza 300 g">Pizza</span>
       </div>
     </section>
 
@@ -181,18 +219,18 @@
         </div>
         <div>
           <label for="goal">Tavoite</label>
-          <select id="goal" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:12px;font-size:16px;">
+          <select id="goal">
             <option value="maintain">Ylläpito</option>
             <option value="light">Kevyt ateria</option>
             <option value="sport">Treenin jälkeinen</option>
           </select>
-          <p class="muted">Tämä ei muuta laskentaa paljon, mutta vaikuttaa palautetekstiin.</p>
+          <p class="muted">Tämä vaikuttaa palautetekstiin.</p>
         </div>
       </div>
 
       <div class="buttons">
         <button id="calculateBtn" class="primary">Laske kalorit</button>
-        <button id="resetBtn" class="secondary" type="button">Tyhjennä</button>
+        <button id="resetBtn" class="ghost" type="button">Tyhjennä</button>
       </div>
     </section>
 
@@ -204,6 +242,8 @@
     </section>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1"></script>
   <script>
     const photoInput = document.getElementById('photo');
     const preview = document.getElementById('preview');
@@ -215,6 +255,14 @@
     const comment = document.getElementById('comment');
     const calculateBtn = document.getElementById('calculateBtn');
     const resetBtn = document.getElementById('resetBtn');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const useSuggestionBtn = document.getElementById('useSuggestionBtn');
+    const analysisSummary = document.getElementById('analysisSummary');
+    const analysisTags = document.getElementById('analysisTags');
+    const statusEl = document.getElementById('status');
+
+    let mobileNetModel = null;
+    let currentSuggestion = '';
 
     const calorieTable = [
       { keys: ['kana'], kcal: 165, unit: '100 g' },
@@ -239,13 +287,26 @@
       { keys: ['hamburger'], kcal: 550, unit: 'annos' }
     ];
 
+    const foodGuesses = [
+      { terms: ['plate', 'dish', 'meal', 'dinner'], suggestion: 'kana 150 g, riisi 200 g, salaatti' },
+      { terms: ['salad'], suggestion: 'salaatti 150 g, kastike 1 rkl' },
+      { terms: ['pizza'], suggestion: 'pizza 300 g' },
+      { terms: ['burger', 'hamburger'], suggestion: 'hamburger 1 annos, ranskalaiset 150 g' },
+      { terms: ['sandwich', 'bagel'], suggestion: 'leipä 2 viipaletta, juusto 30 g, kana 80 g' },
+      { terms: ['egg', 'omelet'], suggestion: 'kananmuna 2 kpl, salaatti 100 g' },
+      { terms: ['rice'], suggestion: 'riisi 200 g, kana 150 g' },
+      { terms: ['pasta', 'spaghetti'], suggestion: 'pasta 220 g, jauheliha 150 g, kastike 2 rkl' },
+      { terms: ['sushi'], suggestion: 'riisi 180 g, lohi 100 g' },
+      { terms: ['steak'], suggestion: 'pihvi 180 g, peruna 250 g, vihannekset 120 g' },
+      { terms: ['fish', 'salmon'], suggestion: 'lohi 180 g, peruna 250 g, vihannekset 120 g' },
+      { terms: ['fries'], suggestion: 'ranskalaiset 180 g' }
+    ];
+
     function parseWeight(text) {
       const gramMatch = text.match(/(\d+)\s*g/);
       if (gramMatch) return { amount: Number(gramMatch[1]), type: 'g' };
-
       const pieceMatch = text.match(/(\d+)\s*(kpl|viipale|rkl|annos)/);
       if (pieceMatch) return { amount: Number(pieceMatch[1]), type: pieceMatch[2] };
-
       return null;
     }
 
@@ -256,25 +317,18 @@
 
       const weight = parseWeight(lower);
       let kcal = item.kcal;
-      let note = item.unit;
 
       if (weight) {
         if (weight.type === 'g') {
           kcal = Math.round((item.kcal / 100) * weight.amount);
-          note = weight.amount + ' g';
         } else if (weight.type === 'rkl' && item.unit === 'rkl') {
           kcal = item.kcal * weight.amount;
-          note = weight.amount + ' rkl';
         } else if ((weight.type === 'kpl' || weight.type === 'viipale' || weight.type === 'annos') && item.unit.includes(weight.type)) {
           kcal = item.kcal * weight.amount;
-          note = weight.amount + ' ' + weight.type;
         }
       }
 
-      return {
-        label: line.trim(),
-        kcal
-      };
+      return { label: line.trim(), kcal };
     }
 
     function getComment(total, selectedGoal) {
@@ -283,16 +337,41 @@
         if (total < 700) return 'Tämä on melko täyttävä kevyeen tavoitteeseen.';
         return 'Tämä on aika runsas, jos tavoitteena on kevyt ateria.';
       }
-
       if (selectedGoal === 'sport') {
         if (total < 500) return 'Tämä voi olla hieman pieni treenin jälkeiseksi ateriaksi.';
         if (total < 850) return 'Tämä näyttää varsin sopivalta treenin jälkeen.';
         return 'Tämä on energinen treenin jälkeinen ateria.';
       }
-
       if (total < 500) return 'Tämä näyttää melko kevyeltä perusaterialta.';
       if (total < 850) return 'Tämä näyttää tavalliselta pääaterialta.';
       return 'Tämä on melko runsas ateria.';
+    }
+
+    function renderTags(predictions) {
+      analysisTags.innerHTML = '';
+      predictions.forEach(pred => {
+        const span = document.createElement('span');
+        span.className = 'tag';
+        span.textContent = `${pred.className} (${Math.round(pred.probability * 100)}%)`;
+        analysisTags.appendChild(span);
+      });
+    }
+
+    function buildSuggestion(predictions) {
+      const labels = predictions.map(p => p.className.toLowerCase());
+      for (const guess of foodGuesses) {
+        const hit = guess.terms.some(term => labels.some(label => label.includes(term)));
+        if (hit) return guess.suggestion;
+      }
+      return 'kana 150 g, riisi 150 g, salaatti 100 g';
+    }
+
+    async function ensureModel() {
+      if (mobileNetModel) return mobileNetModel;
+      statusEl.textContent = 'Ladataan mallia...';
+      mobileNetModel = await mobilenet.load();
+      statusEl.textContent = 'Malli valmis.';
+      return mobileNetModel;
     }
 
     photoInput.addEventListener('change', () => {
@@ -302,6 +381,9 @@
       reader.onload = e => {
         preview.src = e.target.result;
         preview.style.display = 'block';
+        analysisSummary.textContent = 'Kuva valittu. Voit nyt painaa Analysoi kuva.';
+        analysisTags.innerHTML = '';
+        currentSuggestion = '';
       };
       reader.readAsDataURL(file);
     });
@@ -310,6 +392,35 @@
       pill.addEventListener('click', () => {
         foods.value = pill.dataset.fill;
       });
+    });
+
+    analyzeBtn.addEventListener('click', async () => {
+      if (!preview.src) {
+        statusEl.textContent = 'Valitse ensin kuva.';
+        return;
+      }
+
+      try {
+        const model = await ensureModel();
+        statusEl.textContent = 'Analysoidaan kuvaa...';
+        const predictions = await model.classify(preview, 4);
+        renderTags(predictions);
+        currentSuggestion = buildSuggestion(predictions);
+        analysisSummary.textContent = `Sovellus arvelee kuvan liittyvän tähän annokseen: ${currentSuggestion}`;
+        statusEl.textContent = 'Analyysi valmis.';
+      } catch (error) {
+        console.error(error);
+        statusEl.textContent = 'Analyysi epäonnistui.';
+        analysisSummary.textContent = 'Automaattinen tunnistus ei onnistunut tällä kertaa. Voit silti kirjoittaa sisällön käsin.';
+      }
+    });
+
+    useSuggestionBtn.addEventListener('click', () => {
+      if (!currentSuggestion) {
+        foods.value = 'kana 150 g, riisi 200 g, salaatti';
+        return;
+      }
+      foods.value = currentSuggestion;
     });
 
     calculateBtn.addEventListener('click', () => {
@@ -327,11 +438,8 @@
 
       for (const line of lines) {
         const estimation = estimateLine(line);
-        if (estimation) {
-          estimates.push(estimation);
-        } else {
-          unknownCount += 1;
-        }
+        if (estimation) estimates.push(estimation);
+        else unknownCount += 1;
       }
 
       let total = estimates.reduce((sum, item) => sum + item.kcal, 0);
@@ -372,11 +480,15 @@
       result.textContent = 'Ei vielä laskettu.';
       breakdown.innerHTML = '';
       comment.textContent = '';
+      analysisSummary.textContent = 'Ei vielä analysoitu.';
+      analysisTags.innerHTML = '';
+      currentSuggestion = '';
+      statusEl.textContent = '';
     });
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js').catch(console.error);
+        navigator.serviceWorker.register('./service-worker.js?v=3').catch(console.error);
       });
     }
   </script>
