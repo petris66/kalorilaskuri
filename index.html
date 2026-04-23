@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fi">
 <head>
@@ -72,7 +73,6 @@
       font-weight: 300;
     }
 
-    /* STEPS */
     .steps {
       display: flex;
       justify-content: center;
@@ -128,7 +128,6 @@
 
     .step-line.done { background: var(--green); }
 
-    /* WRAP */
     .wrap {
       max-width: 640px;
       margin: 0 auto;
@@ -138,7 +137,6 @@
       gap: 16px;
     }
 
-    /* CARD */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -170,7 +168,6 @@
       font-family: 'DM Sans', sans-serif;
     }
 
-    /* PHOTO ZONE */
     .photo-zone {
       border: 1.5px dashed rgba(245,166,35,0.3);
       border-radius: 16px;
@@ -200,7 +197,6 @@
       border: 1px solid var(--border);
     }
 
-    /* BUTTONS */
     .btn-row {
       display: flex;
       gap: 10px;
@@ -250,7 +246,6 @@
 
     .btn-big { width: 100%; padding: 16px; font-size: 16px; border-radius: 14px; margin-top: 4px; }
 
-    /* STATUS */
     .status {
       margin-top: 12px;
       font-size: 13px;
@@ -259,7 +254,6 @@
       min-height: 18px;
     }
 
-    /* ANALYSIS */
     .analysis-box {
       background: var(--surface2);
       border: 1px solid var(--border);
@@ -270,19 +264,6 @@
     .analysis-box p { font-size: 14px; color: var(--muted); margin-bottom: 10px; line-height: 1.5; }
     .analysis-box p.found { color: var(--text); }
 
-    .tag {
-      display: inline-block;
-      background: rgba(74,222,128,0.1);
-      color: var(--green);
-      border: 1px solid rgba(74,222,128,0.25);
-      border-radius: 999px;
-      padding: 4px 10px;
-      margin: 3px 4px 0 0;
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-    /* TEXTAREA */
     textarea {
       width: 100%;
       background: var(--surface2);
@@ -301,7 +282,6 @@
     textarea:focus { outline: none; border-color: var(--border-active); }
     textarea::placeholder { color: var(--muted); }
 
-    /* PILLS */
     .pill-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -327,7 +307,6 @@
     .pill:hover { border-color: var(--border-active); background: var(--accent-dim); color: var(--accent); }
     .pill .emoji { font-size: 1.3rem; line-height: 1; }
 
-    /* INPUTS */
     select, input[type="number"] {
       width: 100%;
       background: var(--surface2);
@@ -356,10 +335,8 @@
     }
 
     .hint { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
-
     .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
-    /* RESULT */
     .result-card {
       background: linear-gradient(135deg, var(--surface) 0%, #1a1812 100%);
       border: 1px solid var(--border);
@@ -450,10 +427,6 @@
     .breakdown-item .item-name { color: var(--text); }
     .breakdown-item .item-kcal { color: var(--accent); font-weight: 700; }
 
-    .breakdown-item.unknown { border: 1px solid rgba(248,113,113,0.2); }
-    .breakdown-item.unknown .item-name { color: var(--red); }
-    .breakdown-item.unknown .item-kcal { color: var(--muted); font-size: 12px; }
-
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(8px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -515,18 +488,17 @@
       <div class="card-title">Automaattinen ehdotus</div>
       <div class="analysis-box">
         <p id="analysisSummary">Ei vielä analysoitu.</p>
-        <div id="analysisTags"></div>
       </div>
     </div>
 
     <div class="card">
       <div class="card-title"><span class="num">2</span> Tarkista tai muokkaa ruokalista</div>
-      <textarea id="foods" placeholder="Esim. kana 150 g, riisi 200 g, salaatti, kastike 2 rkl"></textarea>
+      <textarea id="foods" placeholder="Esim. kana 150 g: 248 kcal, riisi 200 g: 260 kcal"></textarea>
       <div class="pill-grid">
-        <div class="pill" data-fill="kana 150 g, riisi 200 g, salaatti"><span class="emoji">🍗</span> Kana + riisi</div>
-        <div class="pill" data-fill="lohi 180 g, peruna 250 g, vihannekset"><span class="emoji">🐟</span> Lohi + peruna</div>
-        <div class="pill" data-fill="jauheliha 150 g, pasta 220 g, tomaattikastike"><span class="emoji">🍝</span> Pasta-annos</div>
-        <div class="pill" data-fill="pizza 300 g"><span class="emoji">🍕</span> Pizza</div>
+        <div class="pill" data-fill="kana 150 g: 248 kcal, riisi 200 g: 260 kcal, salaatti 80 g: 16 kcal"><span class="emoji">🍗</span> Kana + riisi</div>
+        <div class="pill" data-fill="lohi 180 g: 374 kcal, peruna 250 g: 200 kcal, vihannekset 100 g: 35 kcal"><span class="emoji">🐟</span> Lohi + peruna</div>
+        <div class="pill" data-fill="jauheliha 150 g: 360 kcal, pasta 220 g: 341 kcal, tomaattikastike 100 g: 40 kcal"><span class="emoji">🍝</span> Pasta-annos</div>
+        <div class="pill" data-fill="pizza 300 g: 810 kcal"><span class="emoji">🍕</span> Pizza</div>
       </div>
     </div>
 
@@ -567,7 +539,6 @@
 
   </div>
 
- 
   <script>
     const photoCameraInput = document.getElementById('photoCamera');
     const photoLibraryInput = document.getElementById('photoLibrary');
@@ -589,7 +560,6 @@
     const analyzeBtn       = document.getElementById('analyzeBtn');
     const useSuggestionBtn = document.getElementById('useSuggestionBtn');
     const analysisSummary  = document.getElementById('analysisSummary');
-    const analysisTags     = document.getElementById('analysisTags');
     const statusEl         = document.getElementById('status');
     const step1 = document.getElementById('step1');
     const step2 = document.getElementById('step2');
@@ -597,7 +567,6 @@
     const line1 = document.getElementById('line1');
     const line2 = document.getElementById('line2');
 
-    
     let currentSuggestion = '';
     let imageLoaded = false;
 
@@ -609,63 +578,6 @@
       });
       line1.classList.toggle('done', active > 2);
       line2.classList.toggle('done', active > 3);
-    }
-
-    const calorieTable = [
-      { keys: ['kana'],                 kcal: 165, unit: '100 g' },
-      { keys: ['broileri'],             kcal: 165, unit: '100 g' },
-      { keys: ['naudanliha','pihvi'],   kcal: 250, unit: '100 g' },
-      { keys: ['jauheliha'],            kcal: 240, unit: '100 g' },
-      { keys: ['lohi'],                 kcal: 208, unit: '100 g' },
-      { keys: ['tonnikala'],            kcal: 130, unit: '100 g' },
-      { keys: ['riisi'],                kcal: 130, unit: '100 g' },
-      { keys: ['pasta'],                kcal: 155, unit: '100 g' },
-      { keys: ['peruna'],               kcal: 80,  unit: '100 g' },
-      { keys: ['ranskalaiset'],         kcal: 312, unit: '100 g' },
-      { keys: ['salaatti'],             kcal: 20,  unit: '100 g' },
-      { keys: ['vihannekset'],          kcal: 35,  unit: '100 g' },
-      { keys: ['kastike'],              kcal: 60,  unit: 'rkl'   },
-      { keys: ['öljy'],                 kcal: 120, unit: 'rkl'   },
-      { keys: ['voi'],                  kcal: 102, unit: 'rkl'   },
-      { keys: ['kananmuna','muna'],     kcal: 78,  unit: 'kpl'   },
-      { keys: ['leipä'],                kcal: 80,  unit: 'viipale'},
-      { keys: ['juusto'],               kcal: 120, unit: '30 g'  },
-      { keys: ['pizza'],                kcal: 270, unit: '100 g' },
-      { keys: ['hamburger'],            kcal: 550, unit: 'annos' },
-      { keys: ['poro', 'poronkäristys'], kcal: 180, unit: '100 g' },
-      { keys: ['punajuuri'], kcal: 43, unit: '100 g' },
-      { keys: ['suolakurkku'], kcal: 12, unit: '100 g' },
-      { keys: ['etikka'], kcal: 3, unit: '100 g' },
-      { keys: ['puolukka', 'puolukkahillo'], kcal: 61, unit: '100 g' },
-      { keys: ['perunasose'], kcal: 85, unit: '100 g' },
-      { keys: ['lihapulla'], kcal: 220, unit: '100 g' },
-      { keys: ['makkarа', 'nakki'], kcal: 280, unit: '100 g' },
-      { keys: ['silakka'], kcal: 130, unit: '100 g' },
-      { keys: ['smetana', 'kermaviili'], kcal: 120, unit: '100 g' },
-    ];
-
-    
-
-    function parseWeight(text) {
-      const gm = text.match(/(\d+)\s*g/);
-      if (gm) return { amount: Number(gm[1]), type: 'g' };
-      const pm = text.match(/(\d+)\s*(kpl|viipale|rkl|annos)/);
-      if (pm) return { amount: Number(pm[1]), type: pm[2] };
-      return null;
-    }
-
-    function estimateLine(line) {
-      const lower = line.toLowerCase().trim();
-      const item = calorieTable.find(e => e.keys.some(k => lower.includes(k)));
-      if (!item) return null;
-      const weight = parseWeight(lower);
-      let kcal = item.kcal;
-      if (weight) {
-        if (weight.type === 'g') kcal = Math.round((item.kcal / 100) * weight.amount);
-        else if (weight.type === 'rkl' && item.unit === 'rkl') kcal = item.kcal * weight.amount;
-        else if (['kpl','viipale','annos'].includes(weight.type) && item.unit.includes(weight.type)) kcal = item.kcal * weight.amount;
-      }
-      return { label: line.trim(), kcal };
     }
 
     function getComment(total, g) {
@@ -684,12 +596,6 @@
       return '🍽 Runsas ateria.';
     }
 
-    
-
-    
-
-    
-
     function handleSelectedFile(file) {
       if (!file) return;
       const reader = new FileReader();
@@ -700,7 +606,6 @@
         imageLoaded = true;
         analysisSummary.textContent = 'Kuva valittu — paina Analysoi kuva.';
         analysisSummary.className = 'found';
-        analysisTags.innerHTML = '';
         currentSuggestion = '';
         statusEl.textContent = '✓ Kuva ladattu.';
         updateSteps(2);
@@ -722,46 +627,43 @@
       });
     });
 
-   
     analyzeBtn.addEventListener('click', async () => {
-  if (!imageLoaded) { statusEl.textContent = '⚠️ Valitse ensin kuva.'; return; }
-  try {
-    statusEl.textContent = '🔍 Analysoidaan kuvaa...';
+      if (!imageLoaded) { statusEl.textContent = '⚠️ Valitse ensin kuva.'; return; }
+      try {
+        statusEl.textContent = '🔍 Analysoidaan kuvaa...';
+        const canvas = document.createElement('canvas');
+        const maxSize = 800;
+        let w = preview.naturalWidth;
+        let h = preview.naturalHeight;
+        if (w > maxSize || h > maxSize) {
+          if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+          else { w = Math.round(w * maxSize / h); h = maxSize; }
+        }
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext('2d').drawImage(preview, 0, 0, w, h);
+        const smallImage = canvas.toDataURL('image/jpeg', 0.7);
 
-    // Pienennetään kuva ennen lähetystä
-    const canvas = document.createElement('canvas');
-    const maxSize = 800;
-    let w = preview.naturalWidth;
-    let h = preview.naturalHeight;
-    if (w > maxSize || h > maxSize) {
-      if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
-      else { w = Math.round(w * maxSize / h); h = maxSize; }
-    }
-    canvas.width = w;
-    canvas.height = h;
-    canvas.getContext('2d').drawImage(preview, 0, 0, w, h);
-    const smallImage = canvas.toDataURL('image/jpeg', 0.7);
-
-    const response = await fetch('/api/analyze', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image: smallImage })
+        const response = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: smallImage })
+        });
+        const data = await response.json();
+        if (data.result) {
+          currentSuggestion = data.result;
+          analysisSummary.textContent = `Ehdotus: ${data.result}`;
+          analysisSummary.className = 'found';
+          statusEl.textContent = '✓ Analyysi valmis.';
+          updateSteps(2);
+        } else {
+          statusEl.textContent = '⚠️ Analyysi epäonnistui.';
+        }
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = '⚠️ Analyysi epäonnistui.';
+      }
     });
-    const data = await response.json();
-    if (data.result) {
-      currentSuggestion = data.result;
-      analysisSummary.textContent = `Ehdotus: ${data.result}`;
-      analysisSummary.className = 'found';
-      statusEl.textContent = '✓ Analyysi valmis.';
-      updateSteps(2);
-    } else {
-      statusEl.textContent = '⚠️ Analyysi epäonnistui.';
-    }
-  } catch (err) {
-    console.error(err);
-    statusEl.textContent = '⚠️ Analyysi epäonnistui.';
-  }
-});
 
     useSuggestionBtn.addEventListener('click', () => {
       if (!currentSuggestion) { statusEl.textContent = '⚠️ Analysoi kuva ensin.'; return; }
@@ -769,69 +671,53 @@
       updateSteps(3);
     });
 
-   calculateBtn.addEventListener('click', () => {
-  const text = foods.value.trim();
-  if (!text) {
-    kcalDisplay.textContent = '—';
-    kcalDisplay.className = 'kcal-display empty';
-    kcalUnit.textContent = 'Kirjoita ensin ruokalista.';
-    breakdown.innerHTML = '';
-    return;
-  }
+    calculateBtn.addEventListener('click', () => {
+      const text = foods.value.trim();
+      if (!text) {
+        kcalDisplay.textContent = '—';
+        kcalDisplay.className = 'kcal-display empty';
+        kcalUnit.textContent = 'Kirjoita ensin ruokalista.';
+        breakdown.innerHTML = '';
+        return;
+      }
 
-  const lines = text.split('\n').concat(text.split(',')).map(s => s.trim()).filter(Boolean);
-  const estimates = [];
-  let total = 0;
+      const lines = text.split('\n').flatMap(l => l.split(',')).map(s => s.trim()).filter(Boolean);
+      const estimates = [];
+      let total = 0;
 
-  for (const line of lines) {
-    // Yritetään lukea Geminin formaatti "ruoka määrä g: X kcal"
-    const geminiMatch = line.match(/^(.+?):\s*(\d+)\s*kcal/i);
-    if (geminiMatch) {
-      const label = geminiMatch[1].trim();
-      const kcal = Number(geminiMatch[2]);
-      estimates.push({ label, kcal });
-      total += kcal;
-    } else {
-      // Fallback vanhaan laskentaan
-      const est = estimateLine(line);
-      if (est) { estimates.push(est); total += est.kcal; }
-    }
-  }
+      for (const line of lines) {
+        const match = line.match(/^(.+?):\s*(\d+)\s*kcal/i);
+        if (match) {
+          const label = match[1].trim();
+          const kcal = Number(match[2]);
+          estimates.push({ label, kcal });
+          total += kcal;
+        }
+      }
 
-  const extraCal = Number(extra.value || 0);
-  total += extraCal;
+      const extraCal = Number(extra.value || 0);
+      total += extraCal;
 
-  kcalDisplay.textContent = total;
-  kcalDisplay.className = 'kcal-display';
-  kcalUnit.textContent = 'kcal';
+      kcalDisplay.textContent = total;
+      kcalDisplay.className = 'kcal-display';
+      kcalUnit.textContent = 'kcal';
 
-  barWrap.style.display = 'block';
-  kcalBar.style.width = Math.min((total / 1000) * 100, 100) + '%';
-  kcalBar.className = 'kcal-bar';
-  if (total < 450) kcalBar.classList.add('light');
-  else if (total > 900) kcalBar.classList.add('heavy');
+      barWrap.style.display = 'block';
+      kcalBar.style.width = Math.min((total / 1000) * 100, 100) + '%';
+      kcalBar.className = 'kcal-bar';
+      if (total < 450) kcalBar.classList.add('light');
+      else if (total > 900) kcalBar.classList.add('heavy');
 
-  comment.textContent = getComment(total, goal.value);
-  breakdown.innerHTML = '';
+      comment.textContent = getComment(total, goal.value);
+      breakdown.innerHTML = '';
 
-  estimates.forEach((item, i) => {
-    const div = document.createElement('div');
-    div.className = 'breakdown-item';
-    div.style.animationDelay = (i * 0.05) + 's';
-    div.innerHTML = `<span class="item-name">${item.label}</span><span class="item-kcal">${item.kcal} kcal</span>`;
-    breakdown.appendChild(div);
-  });
-
-  if (extraCal > 0) {
-    const div = document.createElement('div');
-    div.className = 'breakdown-item';
-    div.innerHTML = `<span class="item-name">Lisäkalorit</span><span class="item-kcal">${extraCal} kcal</span>`;
-    breakdown.appendChild(div);
-  });
-
-  updateSteps(3);
-  document.querySelector('.result-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-});
+      estimates.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = 'breakdown-item';
+        div.style.animationDelay = (i * 0.05) + 's';
+        div.innerHTML = `<span class="item-name">${item.label}</span><span class="item-kcal">${item.kcal} kcal</span>`;
+        breakdown.appendChild(div);
+      });
 
       if (extraCal > 0) {
         const div = document.createElement('div');
@@ -839,13 +725,6 @@
         div.innerHTML = `<span class="item-name">Lisäkalorit</span><span class="item-kcal">${extraCal} kcal</span>`;
         breakdown.appendChild(div);
       }
-
-      unknowns.forEach(u => {
-        const div = document.createElement('div');
-        div.className = 'breakdown-item unknown';
-        div.innerHTML = `<span class="item-name">⚠ ${u}</span><span class="item-kcal">ei tunnistettu</span>`;
-        breakdown.appendChild(div);
-      });
 
       updateSteps(3);
       document.querySelector('.result-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -869,13 +748,10 @@
       comment.textContent = '';
       analysisSummary.textContent = 'Ei vielä analysoitu.';
       analysisSummary.className = '';
-      analysisTags.innerHTML = '';
       currentSuggestion = '';
       statusEl.textContent = '';
       updateSteps(1);
     });
-
-    
   </script>
 </body>
 </html>
