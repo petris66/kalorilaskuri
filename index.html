@@ -827,7 +827,7 @@
     div.className = 'breakdown-item';
     div.innerHTML = `<span class="item-name">Lisäkalorit</span><span class="item-kcal">${extraCal} kcal</span>`;
     breakdown.appendChild(div);
-  }
+  });
 
   updateSteps(3);
   document.querySelector('.result-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
