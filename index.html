@@ -5,384 +5,713 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kalorilaskuri</title>
-  <meta name="theme-color" content="#ffffff" />
+  <meta name="theme-color" content="#0d0c09" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Kalorilaskuri" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="icon" href="icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #f6f7f9;
-      --card: #ffffff;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --border: #e5e7eb;
-      --accent: #2563eb;
-      --accent-text: #ffffff;
-      --soft: #eef2ff;
-      --success: #047857;
+      --bg: #0d0c09;
+      --surface: #181610;
+      --surface2: #211f18;
+      --border: rgba(255,255,255,0.07);
+      --border-active: rgba(245,158,11,0.4);
+      --text: #f0ece0;
+      --muted: #7a7464;
+      --accent: #f5a623;
+      --accent-dim: rgba(245,166,35,0.12);
+      --accent-glow: rgba(245,166,35,0.25);
+      --green: #4ade80;
+      --red: #f87171;
     }
 
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: 'DM Sans', sans-serif;
       background: var(--bg);
       color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 60px;
     }
 
-    .wrap {
-      max-width: 780px;
+    .header {
+      padding: 48px 24px 24px;
+      text-align: center;
+      position: relative;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 300px; height: 200px;
+      background: radial-gradient(ellipse at center top, rgba(245,166,35,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+
+    .header h1 span { color: var(--accent); }
+
+    .header p {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 300;
+    }
+
+    /* STEPS */
+    .steps {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px 24px 0;
+      max-width: 500px;
       margin: 0 auto;
-      padding: 16px;
     }
 
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .step-num {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700;
+      color: var(--muted);
+      background: var(--surface);
+      transition: all 0.3s ease;
+    }
+
+    .step.active .step-num {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-dim);
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+
+    .step.done .step-num {
+      border-color: var(--green);
+      color: var(--bg);
+      background: var(--green);
+    }
+
+    .step-label { font-size: 11px; color: var(--muted); font-weight: 500; }
+    .step.active .step-label { color: var(--accent); }
+    .step.done .step-label { color: var(--green); }
+
+    .step-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+      margin: 0 6px 18px;
+      transition: background 0.3s;
+    }
+
+    .step-line.done { background: var(--green); }
+
+    /* WRAP */
+    .wrap {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 24px 16px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* CARD */
     .card {
-      background: var(--card);
+      background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 16px;
-      box-shadow: 0 8px 22px rgba(0,0,0,0.05);
-      margin-bottom: 16px;
+      border-radius: 20px;
+      padding: 24px;
+      transition: border-color 0.3s;
     }
 
-    h1, h2, h3 { margin-top: 0; }
-    p { line-height: 1.45; }
-    .muted { color: var(--muted); }
+    .card.active-card { border-color: var(--border-active); }
 
-    label {
-      display: block;
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    input[type="file"], textarea, input[type="number"], select {
+    .card-title .num {
+      width: 24px; height: 24px;
+      background: var(--accent-dim);
+      border: 1px solid var(--border-active);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700;
+      color: var(--accent);
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* PHOTO ZONE */
+    .photo-zone {
+      border: 1.5px dashed rgba(245,166,35,0.3);
+      border-radius: 16px;
+      padding: 32px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      background: var(--accent-dim);
+    }
+
+    .photo-zone:hover {
+      border-color: var(--accent);
+      background: rgba(245,166,35,0.15);
+    }
+
+    .photo-zone .icon { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+    .photo-zone p { color: var(--muted); font-size: 14px; }
+    .photo-zone p strong { color: var(--accent); font-weight: 500; }
+
+    #preview {
       width: 100%;
-      padding: 12px;
+      max-height: 320px;
+      object-fit: cover;
+      border-radius: 14px;
+      display: none;
+      margin-top: 16px;
       border: 1px solid var(--border);
-      border-radius: 12px;
-      font-size: 16px;
-      background: #fff;
     }
 
-    textarea {
-      min-height: 110px;
-      resize: vertical;
-    }
-
-    .row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .buttons {
+    /* BUTTONS */
+    .btn-row {
       display: flex;
       gap: 10px;
-      flex-wrap: wrap;
       margin-top: 14px;
+      flex-wrap: wrap;
     }
 
     button {
-      border: 0;
+      font-family: 'DM Sans', sans-serif;
+      border: none;
       border-radius: 12px;
-      padding: 12px 16px;
-      font-size: 16px;
+      padding: 12px 18px;
+      font-size: 14px;
       font-weight: 700;
       cursor: pointer;
+      transition: all 0.2s ease;
     }
 
-    .primary {
+    .btn-primary {
       background: var(--accent);
-      color: var(--accent-text);
+      color: #0d0c09;
+      flex: 1;
     }
 
-    .secondary {
-      background: var(--soft);
-      color: #1e3a8a;
+    .btn-primary:hover {
+      background: #fbb53a;
+      box-shadow: 0 4px 20px var(--accent-glow);
+      transform: translateY(-1px);
     }
 
-    .ghost {
-      background: #f3f4f6;
-      color: #111827;
-    }
-
-    .preview {
-      width: 100%;
-      max-height: 360px;
-      object-fit: cover;
-      border-radius: 14px;
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text);
       border: 1px solid var(--border);
-      display: none;
+      flex: 1;
+    }
+
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+    .btn-big { width: 100%; padding: 16px; font-size: 16px; border-radius: 14px; margin-top: 4px; }
+
+    /* STATUS */
+    .status {
       margin-top: 12px;
-      background: #fff;
+      font-size: 13px;
+      color: var(--green);
+      font-weight: 500;
+      min-height: 18px;
     }
 
-    .result {
-      font-size: 20px;
-      font-weight: 800;
-      margin-top: 8px;
-    }
-
-    .breakdown {
-      margin-top: 10px;
-      padding-left: 18px;
-    }
-
-    .pill {
-      display: inline-block;
-      background: #f3f4f6;
+    /* ANALYSIS */
+    .analysis-box {
+      background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 6px 10px;
-      margin: 4px 6px 0 0;
-      font-size: 14px;
-      cursor: pointer;
+      border-radius: 14px;
+      padding: 16px;
     }
 
-    .analysisBox {
-      border: 1px dashed var(--border);
-      border-radius: 14px;
-      padding: 12px;
-      background: #fafafa;
-    }
+    .analysis-box p { font-size: 14px; color: var(--muted); margin-bottom: 10px; line-height: 1.5; }
+    .analysis-box p.found { color: var(--text); }
 
     .tag {
       display: inline-block;
-      background: #ecfeff;
-      color: #155e75;
-      border: 1px solid #bae6fd;
+      background: rgba(74,222,128,0.1);
+      color: var(--green);
+      border: 1px solid rgba(74,222,128,0.25);
       border-radius: 999px;
-      padding: 6px 10px;
-      margin: 4px 6px 0 0;
-      font-size: 14px;
+      padding: 4px 10px;
+      margin: 3px 4px 0 0;
+      font-size: 12px;
+      font-weight: 500;
     }
 
-    .status {
+    /* TEXTAREA */
+    textarea {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      color: var(--text);
+      min-height: 100px;
+      resize: vertical;
+      transition: border-color 0.2s;
+      line-height: 1.6;
+    }
+
+    textarea:focus { outline: none; border-color: var(--border-active); }
+    textarea::placeholder { color: var(--muted); }
+
+    /* PILLS */
+    .pill-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .pill {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s ease;
       font-size: 14px;
-      color: var(--success);
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .pill:hover { border-color: var(--border-active); background: var(--accent-dim); color: var(--accent); }
+    .pill .emoji { font-size: 1.3rem; line-height: 1; }
+
+    /* INPUTS */
+    select, input[type="number"] {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      color: var(--text);
+      transition: border-color 0.2s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    select:focus, input[type="number"]:focus { outline: none; border-color: var(--border-active); }
+    select option { background: var(--surface2); }
+    input[type="number"]::placeholder { color: var(--muted); }
+
+    .field-label {
+      font-size: 12px;
       font-weight: 700;
-      margin-top: 8px;
-      min-height: 20px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
     }
 
-    @media (max-width: 640px) {
-      .row { grid-template-columns: 1fr; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    /* RESULT */
+    .result-card {
+      background: linear-gradient(135deg, var(--surface) 0%, #1a1812 100%);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .result-card::before {
+      content: '';
+      position: absolute;
+      bottom: -40px; right: -40px;
+      width: 180px; height: 180px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .result-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
+
+    .kcal-display {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 10vw, 5rem);
+      font-weight: 900;
+      color: var(--accent);
+      line-height: 1;
+      letter-spacing: -0.02em;
+      transition: all 0.4s ease;
+    }
+
+    .kcal-display.empty {
+      color: var(--surface2);
+      font-size: 2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+    }
+
+    .kcal-unit { font-size: 1rem; color: var(--muted); margin-top: 4px; }
+
+    .kcal-bar-wrap {
+      margin: 20px 0 0;
+      background: var(--surface2);
+      border-radius: 999px;
+      height: 6px;
+      overflow: hidden;
+    }
+
+    .kcal-bar {
+      height: 100%;
+      border-radius: 999px;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.8s cubic-bezier(0.4,0,0.2,1), background 0.4s;
+    }
+
+    .kcal-bar.light { background: var(--green); }
+    .kcal-bar.heavy { background: var(--red); }
+
+    .result-comment { margin-top: 16px; font-size: 14px; color: var(--muted); line-height: 1.5; }
+
+    .breakdown {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-align: left;
+    }
+
+    .breakdown-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      animation: fadeUp 0.3s ease forwards;
+    }
+
+    .breakdown-item .item-name { color: var(--text); }
+    .breakdown-item .item-kcal { color: var(--accent); font-weight: 700; }
+
+    .breakdown-item.unknown { border: 1px solid rgba(248,113,113,0.2); }
+    .breakdown-item.unknown .item-name { color: var(--red); }
+    .breakdown-item.unknown .item-kcal { color: var(--muted); font-size: 12px; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 500px) {
+      .two-col { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <section class="card">
-      <h1>Kalorilaskuri</h1>
-      <p class="muted">Tämä versio on aiempaa automaattisempi: voit valita kuvan, antaa sovelluksen yrittää tunnistaa sisältöä ja käyttää ehdotusta kalorilaskennan pohjana.</p>
-    </section>
 
-    <section class="card">
-      <label>1. Lisää kuva annoksesta</label>
-      <div class="buttons">
-        <button id="openCameraBtn" class="primary" type="button">Ota kuva</button>
-        <button id="openLibraryBtn" class="secondary" type="button">Valitse kuvista</button>
+  <div class="header">
+    <h1>Kalori<span>laskuri</span></h1>
+    <p>Tunnista annos kuvasta tai kirjoita itse</p>
+  </div>
+
+  <div class="steps">
+    <div class="step active" id="step1">
+      <div class="step-num">1</div>
+      <div class="step-label">Kuva</div>
+    </div>
+    <div class="step-line" id="line1"></div>
+    <div class="step" id="step2">
+      <div class="step-num">2</div>
+      <div class="step-label">Ruokalista</div>
+    </div>
+    <div class="step-line" id="line2"></div>
+    <div class="step" id="step3">
+      <div class="step-num">3</div>
+      <div class="step-label">Laske</div>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <div class="card active-card">
+      <div class="card-title"><span class="num">1</span> Lisää kuva annoksesta</div>
+      <div class="photo-zone" id="photoZone">
+        <span class="icon">📸</span>
+        <p><strong>Ota kuva</strong> tai <strong>valitse kuvistasi</strong></p>
+        <p>Tunnistamme ruoan automaattisesti</p>
       </div>
       <input id="photoCamera" type="file" accept="image/*" capture="environment" style="display:none;" />
       <input id="photoLibrary" type="file" accept="image/*" style="display:none;" />
-      <img id="preview" class="preview" alt="Kuvan esikatselu" />
-      <div class="buttons">
-        <button id="analyzeBtn" class="primary" type="button">Analysoi kuva</button>
-        <button id="useSuggestionBtn" class="secondary" type="button">Käytä ehdotusta</button>
+      <img id="preview" alt="Kuvan esikatselu" />
+      <div class="btn-row">
+        <button class="btn-primary" id="openCameraBtn" type="button">📷 Ota kuva</button>
+        <button class="btn-secondary" id="openLibraryBtn" type="button">🖼 Kuvista</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn-secondary" id="analyzeBtn" type="button">🔍 Analysoi kuva</button>
+        <button class="btn-secondary" id="useSuggestionBtn" type="button">✓ Käytä ehdotusta</button>
       </div>
       <div id="status" class="status"></div>
-    </section>
+    </div>
 
-    <section class="card">
-      <h2>Automaattinen ehdotus</h2>
-      <div class="analysisBox">
-        <p id="analysisSummary" class="muted">Ei vielä analysoitu.</p>
+    <div class="card">
+      <div class="card-title">Automaattinen ehdotus</div>
+      <div class="analysis-box">
+        <p id="analysisSummary">Ei vielä analysoitu.</p>
         <div id="analysisTags"></div>
       </div>
-    </section>
+    </div>
 
-    <section class="card">
-      <label for="foods">2. Tarkista tai muokkaa ruokalista</label>
+    <div class="card">
+      <div class="card-title"><span class="num">2</span> Tarkista tai muokkaa ruokalista</div>
       <textarea id="foods" placeholder="Esim. kana 150 g, riisi 200 g, salaatti, kastike 2 rkl"></textarea>
-      <div>
-        <span class="pill" data-fill="kana 150 g, riisi 200 g, salaatti">Kana + riisi</span>
-        <span class="pill" data-fill="lohi 180 g, peruna 250 g, vihannekset">Lohi + peruna</span>
-        <span class="pill" data-fill="jauheliha 150 g, pasta 220 g, tomaattikastike">Pasta-annos</span>
-        <span class="pill" data-fill="pizza 300 g">Pizza</span>
+      <div class="pill-grid">
+        <div class="pill" data-fill="kana 150 g, riisi 200 g, salaatti"><span class="emoji">🍗</span> Kana + riisi</div>
+        <div class="pill" data-fill="lohi 180 g, peruna 250 g, vihannekset"><span class="emoji">🐟</span> Lohi + peruna</div>
+        <div class="pill" data-fill="jauheliha 150 g, pasta 220 g, tomaattikastike"><span class="emoji">🍝</span> Pasta-annos</div>
+        <div class="pill" data-fill="pizza 300 g"><span class="emoji">🍕</span> Pizza</div>
       </div>
-    </section>
+    </div>
 
-    <section class="card">
-      <div class="row">
+    <div class="card">
+      <div class="card-title"><span class="num">3</span> Lisätiedot & laskenta</div>
+      <div class="two-col">
         <div>
-          <label for="extra">3. Lisää tarkennus</label>
-          <!-- KORJAUS: selkeämpi placeholder -->
-          <input id="extra" type="number" min="0" step="1" placeholder="Lisäkalorit (kcal), esim. 120" />
-          <p class="muted">Tähän voit lisätä esim. juoman, jälkiruoan tai ylimääräisen öljyn kalorit.</p>
+          <div class="field-label">Lisäkalorit (kcal)</div>
+          <input id="extra" type="number" min="0" step="1" placeholder="esim. 120" />
+          <p class="hint">Juoma, jälkiruoka, öljy tms.</p>
         </div>
         <div>
-          <label for="goal">Tavoite</label>
+          <div class="field-label">Tavoite</div>
           <select id="goal">
-            <option value="maintain">Ylläpito</option>
-            <option value="light">Kevyt ateria</option>
-            <option value="sport">Treenin jälkeinen</option>
+            <option value="maintain">⚖️ Ylläpito</option>
+            <option value="light">🥗 Kevyt ateria</option>
+            <option value="sport">💪 Treenin jälkeen</option>
           </select>
-          <p class="muted">Tämä vaikuttaa palautetekstiin.</p>
+          <p class="hint">Vaikuttaa palautetekstiin.</p>
         </div>
       </div>
-
-      <div class="buttons">
-        <button id="calculateBtn" class="primary">Laske kalorit</button>
-        <button id="resetBtn" class="ghost" type="button">Tyhjennä</button>
+      <div class="btn-row" style="margin-top:20px;">
+        <button class="btn-primary btn-big" id="calculateBtn">Laske kalorit</button>
+        <button class="btn-ghost" id="resetBtn" type="button" style="padding:12px 18px;">✕</button>
       </div>
-    </section>
+    </div>
 
-    <section class="card">
-      <h2>Tulos</h2>
-      <div id="result" class="result">Ei vielä laskettu.</div>
-      <ul id="breakdown" class="breakdown"></ul>
-      <p id="comment" class="muted"></p>
-    </section>
-  </main>
+    <div class="result-card">
+      <div class="result-label">Arvioitu energiasisältö</div>
+      <div class="kcal-display empty" id="kcalDisplay">—</div>
+      <div class="kcal-unit" id="kcalUnit"></div>
+      <div class="kcal-bar-wrap" id="barWrap" style="display:none;">
+        <div class="kcal-bar" id="kcalBar"></div>
+      </div>
+      <p class="result-comment" id="comment"></p>
+      <div class="breakdown" id="breakdown"></div>
+    </div>
+
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1"></script>
   <script>
     const photoCameraInput = document.getElementById('photoCamera');
     const photoLibraryInput = document.getElementById('photoLibrary');
-    const openCameraBtn = document.getElementById('openCameraBtn');
-    const openLibraryBtn = document.getElementById('openLibraryBtn');
-    const preview = document.getElementById('preview');
-    const foods = document.getElementById('foods');
-    const extra = document.getElementById('extra');
-    const goal = document.getElementById('goal');
-    const result = document.getElementById('result');
-    const breakdown = document.getElementById('breakdown');
-    const comment = document.getElementById('comment');
-    const calculateBtn = document.getElementById('calculateBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const analyzeBtn = document.getElementById('analyzeBtn');
+    const openCameraBtn    = document.getElementById('openCameraBtn');
+    const openLibraryBtn   = document.getElementById('openLibraryBtn');
+    const photoZone        = document.getElementById('photoZone');
+    const preview          = document.getElementById('preview');
+    const foods            = document.getElementById('foods');
+    const extra            = document.getElementById('extra');
+    const goal             = document.getElementById('goal');
+    const kcalDisplay      = document.getElementById('kcalDisplay');
+    const kcalUnit         = document.getElementById('kcalUnit');
+    const kcalBar          = document.getElementById('kcalBar');
+    const barWrap          = document.getElementById('barWrap');
+    const breakdown        = document.getElementById('breakdown');
+    const comment          = document.getElementById('comment');
+    const calculateBtn     = document.getElementById('calculateBtn');
+    const resetBtn         = document.getElementById('resetBtn');
+    const analyzeBtn       = document.getElementById('analyzeBtn');
     const useSuggestionBtn = document.getElementById('useSuggestionBtn');
-    const analysisSummary = document.getElementById('analysisSummary');
-    const analysisTags = document.getElementById('analysisTags');
-    const statusEl = document.getElementById('status');
+    const analysisSummary  = document.getElementById('analysisSummary');
+    const analysisTags     = document.getElementById('analysisTags');
+    const statusEl         = document.getElementById('status');
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const step3 = document.getElementById('step3');
+    const line1 = document.getElementById('line1');
+    const line2 = document.getElementById('line2');
 
     let mobileNetModel = null;
     let currentSuggestion = '';
-    // KORJAUS: seurataan onko kuva oikeasti ladattu
     let imageLoaded = false;
 
+    function updateSteps(active) {
+      [step1, step2, step3].forEach((s, i) => {
+        s.classList.remove('active', 'done');
+        if (i + 1 < active) s.classList.add('done');
+        else if (i + 1 === active) s.classList.add('active');
+      });
+      line1.classList.toggle('done', active > 2);
+      line2.classList.toggle('done', active > 3);
+    }
+
     const calorieTable = [
-      { keys: ['kana'], kcal: 165, unit: '100 g' },
-      { keys: ['broileri'], kcal: 165, unit: '100 g' },
-      { keys: ['naudanliha', 'pihvi'], kcal: 250, unit: '100 g' },
-      { keys: ['jauheliha'], kcal: 240, unit: '100 g' },
-      { keys: ['lohi'], kcal: 208, unit: '100 g' },
-      { keys: ['tonnikala'], kcal: 130, unit: '100 g' },
-      { keys: ['riisi'], kcal: 130, unit: '100 g' },
-      { keys: ['pasta'], kcal: 155, unit: '100 g' },
-      { keys: ['peruna'], kcal: 80, unit: '100 g' },
-      { keys: ['ranskalaiset'], kcal: 312, unit: '100 g' },
-      { keys: ['salaatti'], kcal: 20, unit: '100 g' },
-      { keys: ['vihannekset'], kcal: 35, unit: '100 g' },
-      { keys: ['kastike'], kcal: 60, unit: 'rkl' },
-      { keys: ['öljy'], kcal: 120, unit: 'rkl' },
-      { keys: ['voi'], kcal: 102, unit: 'rkl' },
-      { keys: ['kananmuna', 'muna'], kcal: 78, unit: 'kpl' },
-      { keys: ['leipä'], kcal: 80, unit: 'viipale' },
-      { keys: ['juusto'], kcal: 120, unit: '30 g' },
-      { keys: ['pizza'], kcal: 270, unit: '100 g' },
-      { keys: ['hamburger'], kcal: 550, unit: 'annos' }
+      { keys: ['kana'],                 kcal: 165, unit: '100 g' },
+      { keys: ['broileri'],             kcal: 165, unit: '100 g' },
+      { keys: ['naudanliha','pihvi'],   kcal: 250, unit: '100 g' },
+      { keys: ['jauheliha'],            kcal: 240, unit: '100 g' },
+      { keys: ['lohi'],                 kcal: 208, unit: '100 g' },
+      { keys: ['tonnikala'],            kcal: 130, unit: '100 g' },
+      { keys: ['riisi'],                kcal: 130, unit: '100 g' },
+      { keys: ['pasta'],                kcal: 155, unit: '100 g' },
+      { keys: ['peruna'],               kcal: 80,  unit: '100 g' },
+      { keys: ['ranskalaiset'],         kcal: 312, unit: '100 g' },
+      { keys: ['salaatti'],             kcal: 20,  unit: '100 g' },
+      { keys: ['vihannekset'],          kcal: 35,  unit: '100 g' },
+      { keys: ['kastike'],              kcal: 60,  unit: 'rkl'   },
+      { keys: ['öljy'],                 kcal: 120, unit: 'rkl'   },
+      { keys: ['voi'],                  kcal: 102, unit: 'rkl'   },
+      { keys: ['kananmuna','muna'],     kcal: 78,  unit: 'kpl'   },
+      { keys: ['leipä'],                kcal: 80,  unit: 'viipale'},
+      { keys: ['juusto'],               kcal: 120, unit: '30 g'  },
+      { keys: ['pizza'],                kcal: 270, unit: '100 g' },
+      { keys: ['hamburger'],            kcal: 550, unit: 'annos' }
     ];
 
     const foodGuesses = [
-      { terms: ['plate', 'dish', 'meal', 'dinner'], suggestion: 'kana 150 g, riisi 200 g, salaatti' },
-      { terms: ['salad'], suggestion: 'salaatti 150 g, kastike 1 rkl' },
-      { terms: ['pizza'], suggestion: 'pizza 300 g' },
-      { terms: ['burger', 'hamburger'], suggestion: 'hamburger 1 annos, ranskalaiset 150 g' },
-      { terms: ['sandwich', 'bagel'], suggestion: 'leipä 2 viipaletta, juusto 30 g, kana 80 g' },
-      { terms: ['egg', 'omelet'], suggestion: 'kananmuna 2 kpl, salaatti 100 g' },
-      { terms: ['rice'], suggestion: 'riisi 200 g, kana 150 g' },
-      { terms: ['pasta', 'spaghetti'], suggestion: 'pasta 220 g, jauheliha 150 g, kastike 2 rkl' },
-      { terms: ['sushi'], suggestion: 'riisi 180 g, lohi 100 g' },
-      { terms: ['steak'], suggestion: 'pihvi 180 g, peruna 250 g, vihannekset 120 g' },
-      { terms: ['fish', 'salmon'], suggestion: 'lohi 180 g, peruna 250 g, vihannekset 120 g' },
-      { terms: ['fries'], suggestion: 'ranskalaiset 180 g' }
+      { terms: ['plate','dish','meal','dinner'], suggestion: 'kana 150 g, riisi 200 g, salaatti' },
+      { terms: ['salad'],                        suggestion: 'salaatti 150 g, kastike 1 rkl' },
+      { terms: ['pizza'],                        suggestion: 'pizza 300 g' },
+      { terms: ['burger','hamburger'],           suggestion: 'hamburger 1 annos, ranskalaiset 150 g' },
+      { terms: ['sandwich','bagel'],             suggestion: 'leipä 2 viipaletta, juusto 30 g, kana 80 g' },
+      { terms: ['egg','omelet'],                 suggestion: 'kananmuna 2 kpl, salaatti 100 g' },
+      { terms: ['rice'],                         suggestion: 'riisi 200 g, kana 150 g' },
+      { terms: ['pasta','spaghetti'],            suggestion: 'pasta 220 g, jauheliha 150 g, kastike 2 rkl' },
+      { terms: ['sushi'],                        suggestion: 'riisi 180 g, lohi 100 g' },
+      { terms: ['steak'],                        suggestion: 'pihvi 180 g, peruna 250 g, vihannekset 120 g' },
+      { terms: ['fish','salmon'],                suggestion: 'lohi 180 g, peruna 250 g, vihannekset 120 g' },
+      { terms: ['fries'],                        suggestion: 'ranskalaiset 180 g' }
     ];
 
     function parseWeight(text) {
-      const gramMatch = text.match(/(\d+)\s*g/);
-      if (gramMatch) return { amount: Number(gramMatch[1]), type: 'g' };
-      const pieceMatch = text.match(/(\d+)\s*(kpl|viipale|rkl|annos)/);
-      if (pieceMatch) return { amount: Number(pieceMatch[1]), type: pieceMatch[2] };
+      const gm = text.match(/(\d+)\s*g/);
+      if (gm) return { amount: Number(gm[1]), type: 'g' };
+      const pm = text.match(/(\d+)\s*(kpl|viipale|rkl|annos)/);
+      if (pm) return { amount: Number(pm[1]), type: pm[2] };
       return null;
     }
 
     function estimateLine(line) {
       const lower = line.toLowerCase().trim();
-      const item = calorieTable.find(entry => entry.keys.some(key => lower.includes(key)));
+      const item = calorieTable.find(e => e.keys.some(k => lower.includes(k)));
       if (!item) return null;
-
       const weight = parseWeight(lower);
       let kcal = item.kcal;
-
       if (weight) {
-        if (weight.type === 'g') {
-          kcal = Math.round((item.kcal / 100) * weight.amount);
-        } else if (weight.type === 'rkl' && item.unit === 'rkl') {
-          kcal = item.kcal * weight.amount;
-        } else if ((weight.type === 'kpl' || weight.type === 'viipale' || weight.type === 'annos') && item.unit.includes(weight.type)) {
-          kcal = item.kcal * weight.amount;
-        }
+        if (weight.type === 'g') kcal = Math.round((item.kcal / 100) * weight.amount);
+        else if (weight.type === 'rkl' && item.unit === 'rkl') kcal = item.kcal * weight.amount;
+        else if (['kpl','viipale','annos'].includes(weight.type) && item.unit.includes(weight.type)) kcal = item.kcal * weight.amount;
       }
-
       return { label: line.trim(), kcal };
     }
 
-    function getComment(total, selectedGoal) {
-      if (selectedGoal === 'light') {
-        if (total < 450) return 'Tämä näyttää kevyeltä aterialta.';
-        if (total < 700) return 'Tämä on melko täyttävä kevyeen tavoitteeseen.';
-        return 'Tämä on aika runsas, jos tavoitteena on kevyt ateria.';
+    function getComment(total, g) {
+      if (g === 'light') {
+        if (total < 450) return '✅ Tämä näyttää kevyeltä aterialta.';
+        if (total < 700) return '⚠️ Melko täyttävä kevyeen tavoitteeseen.';
+        return '🔴 Aika runsas, jos tavoitteena on kevyt ateria.';
       }
-      if (selectedGoal === 'sport') {
-        if (total < 500) return 'Tämä voi olla hieman pieni treenin jälkeiseksi ateriaksi.';
-        if (total < 850) return 'Tämä näyttää varsin sopivalta treenin jälkeen.';
-        return 'Tämä on energinen treenin jälkeinen ateria.';
+      if (g === 'sport') {
+        if (total < 500) return '⚠️ Saattaa olla hieman pieni treenin jälkeen.';
+        if (total < 850) return '✅ Sopivan kokoinen treenin jälkeinen ateria.';
+        return '💪 Energinen treenin jälkeinen ateria.';
       }
-      if (total < 500) return 'Tämä näyttää melko kevyeltä perusaterialta.';
-      if (total < 850) return 'Tämä näyttää tavalliselta pääaterialta.';
-      return 'Tämä on melko runsas ateria.';
+      if (total < 500) return '🥗 Kevyt perusateria.';
+      if (total < 850) return '✅ Tavallinen pääateria.';
+      return '🍽 Runsas ateria.';
     }
 
-    function renderTags(predictions) {
+    function renderTags(preds) {
       analysisTags.innerHTML = '';
-      predictions.forEach(pred => {
-        const span = document.createElement('span');
-        span.className = 'tag';
-        span.textContent = `${pred.className} (${Math.round(pred.probability * 100)}%)`;
-        analysisTags.appendChild(span);
+      preds.forEach(p => {
+        const s = document.createElement('span');
+        s.className = 'tag';
+        s.textContent = `${p.className} ${Math.round(p.probability * 100)}%`;
+        analysisTags.appendChild(s);
       });
     }
 
-    function buildSuggestion(predictions) {
-      const labels = predictions.map(p => p.className.toLowerCase());
-      for (const guess of foodGuesses) {
-        const hit = guess.terms.some(term => labels.some(label => label.includes(term)));
-        if (hit) return guess.suggestion;
+    function buildSuggestion(preds) {
+      const labels = preds.map(p => p.className.toLowerCase());
+      for (const g of foodGuesses) {
+        if (g.terms.some(t => labels.some(l => l.includes(t)))) return g.suggestion;
       }
       return 'kana 150 g, riisi 150 g, salaatti 100 g';
     }
 
     async function ensureModel() {
       if (mobileNetModel) return mobileNetModel;
-      statusEl.textContent = 'Ladataan mallia...';
+      statusEl.textContent = '⏳ Ladataan mallia...';
       mobileNetModel = await mobilenet.load();
-      statusEl.textContent = 'Malli valmis.';
+      statusEl.textContent = '✓ Malli valmis.';
       return mobileNetModel;
     }
 
@@ -392,119 +721,118 @@
       reader.onload = e => {
         preview.src = e.target.result;
         preview.style.display = 'block';
-        // KORJAUS: merkitään kuva ladatuksi
+        photoZone.style.display = 'none';
         imageLoaded = true;
-        analysisSummary.textContent = 'Kuva valittu. Voit nyt painaa Analysoi kuva.';
+        analysisSummary.textContent = 'Kuva valittu — paina Analysoi kuva.';
+        analysisSummary.className = 'found';
         analysisTags.innerHTML = '';
         currentSuggestion = '';
-        statusEl.textContent = 'Kuva ladattu.';
+        statusEl.textContent = '✓ Kuva ladattu.';
+        updateSteps(2);
       };
       reader.readAsDataURL(file);
     }
 
-    openCameraBtn.addEventListener('click', () => {
-      photoCameraInput.click();
-    });
+    photoZone.addEventListener('click', () => photoLibraryInput.click());
+    openCameraBtn.addEventListener('click', () => photoCameraInput.click());
+    openLibraryBtn.addEventListener('click', () => photoLibraryInput.click());
 
-    openLibraryBtn.addEventListener('click', () => {
-      photoLibraryInput.click();
-    });
-
-    photoCameraInput.addEventListener('change', () => {
-      const file = photoCameraInput.files && photoCameraInput.files[0];
-      handleSelectedFile(file);
-    });
-
-    photoLibraryInput.addEventListener('change', () => {
-      const file = photoLibraryInput.files && photoLibraryInput.files[0];
-      handleSelectedFile(file);
-    });
+    photoCameraInput.addEventListener('change', () => handleSelectedFile(photoCameraInput.files?.[0]));
+    photoLibraryInput.addEventListener('change', () => handleSelectedFile(photoLibraryInput.files?.[0]));
 
     document.querySelectorAll('.pill').forEach(pill => {
       pill.addEventListener('click', () => {
         foods.value = pill.dataset.fill;
+        updateSteps(3);
       });
     });
 
     analyzeBtn.addEventListener('click', async () => {
-      // KORJAUS: tarkistetaan imageLoaded-lipun avulla, ei preview.src
-      if (!imageLoaded) {
-        statusEl.textContent = 'Valitse ensin kuva.';
-        return;
-      }
-
+      if (!imageLoaded) { statusEl.textContent = '⚠️ Valitse ensin kuva.'; return; }
       try {
         const model = await ensureModel();
-        statusEl.textContent = 'Analysoidaan kuvaa...';
-        const predictions = await model.classify(preview, 4);
-        renderTags(predictions);
-        currentSuggestion = buildSuggestion(predictions);
-        analysisSummary.textContent = `Sovellus arvelee kuvan liittyvän tähän annokseen: ${currentSuggestion}`;
-        statusEl.textContent = 'Analyysi valmis.';
-      } catch (error) {
-        console.error(error);
-        statusEl.textContent = 'Analyysi epäonnistui.';
-        analysisSummary.textContent = 'Automaattinen tunnistus ei onnistunut tällä kertaa. Voit silti kirjoittaa sisällön käsin.';
+        statusEl.textContent = '🔍 Analysoidaan...';
+        const preds = await model.classify(preview, 4);
+        renderTags(preds);
+        currentSuggestion = buildSuggestion(preds);
+        analysisSummary.textContent = `Ehdotus: ${currentSuggestion}`;
+        analysisSummary.className = 'found';
+        statusEl.textContent = '✓ Analyysi valmis.';
+        updateSteps(2);
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = '⚠️ Analyysi epäonnistui.';
+        analysisSummary.textContent = 'Tunnistus ei onnistunut. Voit kirjoittaa sisällön käsin.';
       }
     });
 
     useSuggestionBtn.addEventListener('click', () => {
-      // KORJAUS: näytetään selkeä viesti jos analyysia ei ole tehty
-      if (!currentSuggestion) {
-        statusEl.textContent = 'Analysoi kuva ensin, jotta ehdotus on käytettävissä.';
-        return;
-      }
+      if (!currentSuggestion) { statusEl.textContent = '⚠️ Analysoi kuva ensin.'; return; }
       foods.value = currentSuggestion;
+      updateSteps(3);
     });
 
     calculateBtn.addEventListener('click', () => {
       const text = foods.value.trim();
       if (!text) {
-        result.textContent = 'Kirjoita ensin mitä lautasella on.';
+        kcalDisplay.textContent = '—';
+        kcalDisplay.className = 'kcal-display empty';
+        kcalUnit.textContent = 'Kirjoita ensin ruokalista.';
         breakdown.innerHTML = '';
-        comment.textContent = '';
         return;
       }
 
       const lines = text.split(',').map(s => s.trim()).filter(Boolean);
       const estimates = [];
-      // KORJAUS: kerätään tunnistamattomien rivien nimet, ei vain lukumäärä
-      const unknownItems = [];
+      const unknowns = [];
 
       for (const line of lines) {
-        const estimation = estimateLine(line);
-        if (estimation) estimates.push(estimation);
-        else unknownItems.push(line);
+        const est = estimateLine(line);
+        if (est) estimates.push(est);
+        else unknowns.push(line);
       }
 
-      let total = estimates.reduce((sum, item) => sum + item.kcal, 0);
-      const extraCalories = Number(extra.value || 0);
-      total += extraCalories;
+      let total = estimates.reduce((s, i) => s + i.kcal, 0);
+      const extraCal = Number(extra.value || 0);
+      total += extraCal;
 
-      result.textContent = `Arvio: noin ${total} kcal`;
-      breakdown.innerHTML = '';
+      kcalDisplay.textContent = total;
+      kcalDisplay.className = 'kcal-display';
+      kcalUnit.textContent = 'kcal';
 
-      estimates.forEach(item => {
-        const li = document.createElement('li');
-        li.textContent = `${item.label}: noin ${item.kcal} kcal`;
-        breakdown.appendChild(li);
-      });
-
-      if (extraCalories > 0) {
-        const li = document.createElement('li');
-        li.textContent = `Lisäkalorit: ${extraCalories} kcal`;
-        breakdown.appendChild(li);
-      }
-
-      // KORJAUS: näytetään mitkä rivit jäivät tunnistamatta
-      if (unknownItems.length > 0) {
-        const li = document.createElement('li');
-        li.textContent = `Ei tunnistettu (jätetty pois laskusta): ${unknownItems.join(', ')}`;
-        li.style.color = '#b45309';
-        breakdown.appendChild(li);
-      }
+      barWrap.style.display = 'block';
+      kcalBar.style.width = Math.min((total / 1000) * 100, 100) + '%';
+      kcalBar.className = 'kcal-bar';
+      if (total < 450) kcalBar.classList.add('light');
+      else if (total > 900) kcalBar.classList.add('heavy');
 
       comment.textContent = getComment(total, goal.value);
+      breakdown.innerHTML = '';
+
+      estimates.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = 'breakdown-item';
+        div.style.animationDelay = (i * 0.05) + 's';
+        div.innerHTML = `<span class="item-name">${item.label}</span><span class="item-kcal">${item.kcal} kcal</span>`;
+        breakdown.appendChild(div);
+      });
+
+      if (extraCal > 0) {
+        const div = document.createElement('div');
+        div.className = 'breakdown-item';
+        div.innerHTML = `<span class="item-name">Lisäkalorit</span><span class="item-kcal">${extraCal} kcal</span>`;
+        breakdown.appendChild(div);
+      }
+
+      unknowns.forEach(u => {
+        const div = document.createElement('div');
+        div.className = 'breakdown-item unknown';
+        div.innerHTML = `<span class="item-name">⚠ ${u}</span><span class="item-kcal">ei tunnistettu</span>`;
+        breakdown.appendChild(div);
+      });
+
+      updateSteps(3);
+      document.querySelector('.result-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
 
     resetBtn.addEventListener('click', () => {
@@ -515,17 +843,27 @@
       photoLibraryInput.value = '';
       preview.src = '';
       preview.style.display = 'none';
-      // KORJAUS: nollataan myös imageLoaded-lippu
+      photoZone.style.display = '';
       imageLoaded = false;
-      result.textContent = 'Ei vielä laskettu.';
+      kcalDisplay.textContent = '—';
+      kcalDisplay.className = 'kcal-display empty';
+      kcalUnit.textContent = '';
+      barWrap.style.display = 'none';
       breakdown.innerHTML = '';
       comment.textContent = '';
       analysisSummary.textContent = 'Ei vielä analysoitu.';
+      analysisSummary.className = '';
       analysisTags.innerHTML = '';
       currentSuggestion = '';
       statusEl.textContent = '';
+      updateSteps(1);
     });
 
-    
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js?v=3').catch(console.error);
+      });
+    }
+  </script>
 </body>
 </html>
