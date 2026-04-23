@@ -181,8 +181,13 @@
     </section>
 
     <section class="card">
-      <label for="photo">1. Valitse tai ota kuva</label>
-      <input id="photo" type="file" accept="image/*" />
+      <label>1. Lisää kuva annoksesta</label>
+      <div class="buttons">
+        <button id="openCameraBtn" class="primary" type="button">Ota kuva</button>
+        <button id="openLibraryBtn" class="secondary" type="button">Valitse kuvista</button>
+      </div>
+      <input id="photoCamera" type="file" accept="image/*" capture="environment" style="display:none;" />
+      <input id="photoLibrary" type="file" accept="image/*" style="display:none;" />
       <img id="preview" class="preview" alt="Kuvan esikatselu" />
       <div class="buttons">
         <button id="analyzeBtn" class="primary" type="button">Analysoi kuva</button>
@@ -245,7 +250,10 @@
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1"></script>
   <script>
-    const photoInput = document.getElementById('photo');
+    const photoCameraInput = document.getElementById('photoCamera');
+    const photoLibraryInput = document.getElementById('photoLibrary');
+    const openCameraBtn = document.getElementById('openCameraBtn');
+    const openLibraryBtn = document.getElementById('openLibraryBtn');
     const preview = document.getElementById('preview');
     const foods = document.getElementById('foods');
     const extra = document.getElementById('extra');
@@ -374,8 +382,7 @@
       return mobileNetModel;
     }
 
-    photoInput.addEventListener('change', () => {
-      const file = photoInput.files && photoInput.files[0];
+    function handleSelectedFile(file) {
       if (!file) return;
       const reader = new FileReader();
       reader.onload = e => {
@@ -384,8 +391,27 @@
         analysisSummary.textContent = 'Kuva valittu. Voit nyt painaa Analysoi kuva.';
         analysisTags.innerHTML = '';
         currentSuggestion = '';
+        statusEl.textContent = 'Kuva ladattu.';
       };
       reader.readAsDataURL(file);
+    }
+
+    openCameraBtn.addEventListener('click', () => {
+      photoCameraInput.click();
+    });
+
+    openLibraryBtn.addEventListener('click', () => {
+      photoLibraryInput.click();
+    });
+
+    photoCameraInput.addEventListener('change', () => {
+      const file = photoCameraInput.files && photoCameraInput.files[0];
+      handleSelectedFile(file);
+    });
+
+    photoLibraryInput.addEventListener('change', () => {
+      const file = photoLibraryInput.files && photoLibraryInput.files[0];
+      handleSelectedFile(file);
     });
 
     document.querySelectorAll('.pill').forEach(pill => {
@@ -474,7 +500,8 @@
       foods.value = '';
       extra.value = '';
       goal.value = 'maintain';
-      photoInput.value = '';
+      photoCameraInput.value = '';
+      photoLibraryInput.value = '';
       preview.src = '';
       preview.style.display = 'none';
       result.textContent = 'Ei vielä laskettu.';
