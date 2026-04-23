@@ -1,26 +1,384 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="fi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Minun sovellus</title>
+  <title>Kalorilaskuri</title>
   <meta name="theme-color" content="#ffffff" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="Minun sovellus" />
+  <meta name="apple-mobile-web-app-title" content="Kalorilaskuri" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #2563eb;
+      --accent-text: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+      margin-bottom: 16px;
+    }
+
+    h1, h2 {
+      margin-top: 0;
+    }
+
+    p {
+      line-height: 1.45;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    input[type="file"], textarea, input[type="number"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 16px;
+      background: #fff;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: var(--accent);
+      color: var(--accent-text);
+    }
+
+    .secondary {
+      background: #eef2ff;
+      color: #1e3a8a;
+    }
+
+    .preview {
+      width: 100%;
+      max-height: 340px;
+      object-fit: cover;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      display: none;
+      margin-top: 12px;
+    }
+
+    .result {
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    .breakdown {
+      margin-top: 10px;
+      padding-left: 18px;
+    }
+
+    .pill {
+      display: inline-block;
+      background: #f3f4f6;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 10px;
+      margin: 4px 6px 0 0;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 640px) {
+      .row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
-  <main class="container">
-    <h1>Minun sovellus</h1>
-    <p>Tämä toimii selaimessa ja iPhonen aloitusnäytöstä.</p>
-    <button id="btn">Paina tästä</button>
-    <p id="output"></p>
+  <main class="wrap">
+    <section class="card">
+      <h1>Kalorilaskuri</h1>
+      <p class="muted">Valitse kuva ruoka-annoksesta, kirjoita mitä lautasella on, ja sovellus antaa karkean kalorion arvion.</p>
+    </section>
+
+    <section class="card">
+      <label for="photo">1. Valitse kuva</label>
+      <input id="photo" type="file" accept="image/*" capture="environment" />
+      <img id="preview" class="preview" alt="Kuvan esikatselu" />
+    </section>
+
+    <section class="card">
+      <label for="foods">2. Kirjoita mitä lautasella on</label>
+      <textarea id="foods" placeholder="Esim. kana 150 g, riisi 200 g, salaatti, kastike 2 rkl"></textarea>
+      <div>
+        <span class="pill" data-fill="kana 150 g, riisi 200 g, salaatti">Kana + riisi</span>
+        <span class="pill" data-fill="lohi 180 g, peruna 250 g, vihannekset">Lohi + peruna</span>
+        <span class="pill" data-fill="jauheliha 150 g, pasta 220 g, tomaattikastike">Pasta-annos</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="row">
+        <div>
+          <label for="extra">3. Lisää tarkennus</label>
+          <input id="extra" type="number" min="0" step="1" placeholder="Lisäkalorit, esim. 120" />
+          <p class="muted">Tähän voit lisätä esim. juoman, jälkiruoan tai ylimääräisen öljyn.</p>
+        </div>
+        <div>
+          <label for="goal">Tavoite</label>
+          <select id="goal" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:12px;font-size:16px;">
+            <option value="maintain">Ylläpito</option>
+            <option value="light">Kevyt ateria</option>
+            <option value="sport">Treenin jälkeinen</option>
+          </select>
+          <p class="muted">Tämä ei muuta laskentaa paljon, mutta vaikuttaa palautetekstiin.</p>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button id="calculateBtn" class="primary">Laske kalorit</button>
+        <button id="resetBtn" class="secondary" type="button">Tyhjennä</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Tulos</h2>
+      <div id="result" class="result">Ei vielä laskettu.</div>
+      <ul id="breakdown" class="breakdown"></ul>
+      <p id="comment" class="muted"></p>
+    </section>
   </main>
 
-  <script src="app.js"></script>
+  <script>
+    const photoInput = document.getElementById('photo');
+    const preview = document.getElementById('preview');
+    const foods = document.getElementById('foods');
+    const extra = document.getElementById('extra');
+    const goal = document.getElementById('goal');
+    const result = document.getElementById('result');
+    const breakdown = document.getElementById('breakdown');
+    const comment = document.getElementById('comment');
+    const calculateBtn = document.getElementById('calculateBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    const calorieTable = [
+      { keys: ['kana'], kcal: 165, unit: '100 g' },
+      { keys: ['broileri'], kcal: 165, unit: '100 g' },
+      { keys: ['naudanliha', 'pihvi'], kcal: 250, unit: '100 g' },
+      { keys: ['jauheliha'], kcal: 240, unit: '100 g' },
+      { keys: ['lohi'], kcal: 208, unit: '100 g' },
+      { keys: ['tonnikala'], kcal: 130, unit: '100 g' },
+      { keys: ['riisi'], kcal: 130, unit: '100 g' },
+      { keys: ['pasta'], kcal: 155, unit: '100 g' },
+      { keys: ['peruna'], kcal: 80, unit: '100 g' },
+      { keys: ['ranskalaiset'], kcal: 312, unit: '100 g' },
+      { keys: ['salaatti'], kcal: 20, unit: '100 g' },
+      { keys: ['vihannekset'], kcal: 35, unit: '100 g' },
+      { keys: ['kastike'], kcal: 60, unit: 'rkl' },
+      { keys: ['öljy'], kcal: 120, unit: 'rkl' },
+      { keys: ['voi'], kcal: 102, unit: 'rkl' },
+      { keys: ['kananmuna', 'muna'], kcal: 78, unit: 'kpl' },
+      { keys: ['leipä'], kcal: 80, unit: 'viipale' },
+      { keys: ['juusto'], kcal: 120, unit: '30 g' },
+      { keys: ['pizza'], kcal: 270, unit: '100 g' },
+      { keys: ['hamburger'], kcal: 550, unit: 'annos' }
+    ];
+
+    function parseWeight(text) {
+      const gramMatch = text.match(/(\d+)\s*g/);
+      if (gramMatch) return { amount: Number(gramMatch[1]), type: 'g' };
+
+      const pieceMatch = text.match(/(\d+)\s*(kpl|viipale|rkl|annos)/);
+      if (pieceMatch) return { amount: Number(pieceMatch[1]), type: pieceMatch[2] };
+
+      return null;
+    }
+
+    function estimateLine(line) {
+      const lower = line.toLowerCase().trim();
+      const item = calorieTable.find(entry => entry.keys.some(key => lower.includes(key)));
+      if (!item) return null;
+
+      const weight = parseWeight(lower);
+      let kcal = item.kcal;
+      let note = item.unit;
+
+      if (weight) {
+        if (weight.type === 'g') {
+          kcal = Math.round((item.kcal / 100) * weight.amount);
+          note = weight.amount + ' g';
+        } else if (weight.type === 'rkl' && item.unit === 'rkl') {
+          kcal = item.kcal * weight.amount;
+          note = weight.amount + ' rkl';
+        } else if ((weight.type === 'kpl' || weight.type === 'viipale' || weight.type === 'annos') && item.unit.includes(weight.type)) {
+          kcal = item.kcal * weight.amount;
+          note = weight.amount + ' ' + weight.type;
+        }
+      }
+
+      return {
+        label: line.trim(),
+        kcal
+      };
+    }
+
+    function getComment(total, selectedGoal) {
+      if (selectedGoal === 'light') {
+        if (total < 450) return 'Tämä näyttää kevyeltä aterialta.';
+        if (total < 700) return 'Tämä on melko täyttävä kevyeen tavoitteeseen.';
+        return 'Tämä on aika runsas, jos tavoitteena on kevyt ateria.';
+      }
+
+      if (selectedGoal === 'sport') {
+        if (total < 500) return 'Tämä voi olla hieman pieni treenin jälkeiseksi ateriaksi.';
+        if (total < 850) return 'Tämä näyttää varsin sopivalta treenin jälkeen.';
+        return 'Tämä on energinen treenin jälkeinen ateria.';
+      }
+
+      if (total < 500) return 'Tämä näyttää melko kevyeltä perusaterialta.';
+      if (total < 850) return 'Tämä näyttää tavalliselta pääaterialta.';
+      return 'Tämä on melko runsas ateria.';
+    }
+
+    photoInput.addEventListener('change', () => {
+      const file = photoInput.files && photoInput.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.querySelectorAll('.pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        foods.value = pill.dataset.fill;
+      });
+    });
+
+    calculateBtn.addEventListener('click', () => {
+      const text = foods.value.trim();
+      if (!text) {
+        result.textContent = 'Kirjoita ensin mitä lautasella on.';
+        breakdown.innerHTML = '';
+        comment.textContent = '';
+        return;
+      }
+
+      const lines = text.split(',').map(s => s.trim()).filter(Boolean);
+      const estimates = [];
+      let unknownCount = 0;
+
+      for (const line of lines) {
+        const estimation = estimateLine(line);
+        if (estimation) {
+          estimates.push(estimation);
+        } else {
+          unknownCount += 1;
+        }
+      }
+
+      let total = estimates.reduce((sum, item) => sum + item.kcal, 0);
+      const extraCalories = Number(extra.value || 0);
+      total += extraCalories;
+
+      result.textContent = `Arvio: noin ${total} kcal`;
+      breakdown.innerHTML = '';
+
+      estimates.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = `${item.label}: noin ${item.kcal} kcal`;
+        breakdown.appendChild(li);
+      });
+
+      if (extraCalories > 0) {
+        const li = document.createElement('li');
+        li.textContent = `Lisäkalorit: ${extraCalories} kcal`;
+        breakdown.appendChild(li);
+      }
+
+      if (unknownCount > 0) {
+        const li = document.createElement('li');
+        li.textContent = `${unknownCount} kohtaa jäi ilman tarkkaa arviota.`;
+        breakdown.appendChild(li);
+      }
+
+      comment.textContent = getComment(total, goal.value);
+    });
+
+    resetBtn.addEventListener('click', () => {
+      foods.value = '';
+      extra.value = '';
+      goal.value = 'maintain';
+      photoInput.value = '';
+      preview.src = '';
+      preview.style.display = 'none';
+      result.textContent = 'Ei vielä laskettu.';
+      breakdown.innerHTML = '';
+      comment.textContent = '';
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js').catch(console.error);
+      });
+    }
+  </script>
 </body>
 </html>
