@@ -1,8 +1,7 @@
-const CACHE_NAME = "kalorilaskuri-v3";
+const CACHE_NAME = "kalorilaskuri-v4";
 const URLS_TO_CACHE = [
   "./",
   "./index.html",
-  "./style.css",
   "./app.js",
   "./manifest.webmanifest",
   "./icons/icon-192.png",
@@ -10,6 +9,7 @@ const URLS_TO_CACHE = [
 ];
 
 self.addEventListener("install", (event) => {
+  self.skipWaiting(); // pakottaa uuden version heti käyttöön
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(URLS_TO_CACHE))
   );
@@ -23,7 +23,7 @@ self.addEventListener("activate", (event) => {
           .filter((key) => key !== CACHE_NAME)
           .map((key) => caches.delete(key))
       )
-    )
+    ).then(() => self.clients.claim()) // ottaa hallinnan heti ilman sivun latausta
   );
 });
 
