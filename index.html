@@ -597,7 +597,7 @@
     const line1 = document.getElementById('line1');
     const line2 = document.getElementById('line2');
 
-    let mobileNetModel = null;
+    
     let currentSuggestion = '';
     let imageLoaded = false;
 
@@ -644,20 +644,7 @@
       { keys: ['smetana', 'kermaviili'], kcal: 120, unit: '100 g' },
     ];
 
-    const foodGuesses = [
-      { terms: ['plate','dish','meal','dinner'], suggestion: 'kana 150 g, riisi 200 g, salaatti' },
-      { terms: ['salad'],                        suggestion: 'salaatti 150 g, kastike 1 rkl' },
-      { terms: ['pizza'],                        suggestion: 'pizza 300 g' },
-      { terms: ['burger','hamburger'],           suggestion: 'hamburger 1 annos, ranskalaiset 150 g' },
-      { terms: ['sandwich','bagel'],             suggestion: 'leipä 2 viipaletta, juusto 30 g, kana 80 g' },
-      { terms: ['egg','omelet'],                 suggestion: 'kananmuna 2 kpl, salaatti 100 g' },
-      { terms: ['rice'],                         suggestion: 'riisi 200 g, kana 150 g' },
-      { terms: ['pasta','spaghetti'],            suggestion: 'pasta 220 g, jauheliha 150 g, kastike 2 rkl' },
-      { terms: ['sushi'],                        suggestion: 'riisi 180 g, lohi 100 g' },
-      { terms: ['steak'],                        suggestion: 'pihvi 180 g, peruna 250 g, vihannekset 120 g' },
-      { terms: ['fish','salmon'],                suggestion: 'lohi 180 g, peruna 250 g, vihannekset 120 g' },
-      { terms: ['fries'],                        suggestion: 'ranskalaiset 180 g' }
-    ];
+    
 
     function parseWeight(text) {
       const gm = text.match(/(\d+)\s*g/);
