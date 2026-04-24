@@ -671,54 +671,107 @@
       updateSteps(3);
     });
 
-    calculateBtn.addEventListener('click', () => {
-      const text = foods.value.trim();
-      if (!text) {
-        kcalDisplay.textContent = '—';
-        kcalDisplay.className = 'kcal-display empty';
-        kcalUnit.textContent = 'Kirjoita ensin ruokalista.';
-        breakdown.innerHTML = '';
-        return;
-      }
+    calculateBtn.addEventListener('click', async () => {
+  const text = foods.value.trim();
+  if (!text) {
+    kcalDisplay.textContent = '—';
+    kcalDisplay.className = 'kcal-display empty';
+    kcalUnit.textContent = 'Kirjoita ensin ruokalista.';
+    breakdown.innerHTML = '';
+    return;
+  }
 
-      const lines = text.split('\n').flatMap(l => l.split(',')).map(s => s.trim()).filter(Boolean);
-      const estimates = [];
-      let total = 0;
+  const lines = text.split('\n').flatMap(l => l.split(',')).map(s => s.trim()).filter(Boolean);
+  const known = [];      // rivit joissa jo kcal
+  const unknown = [];    // vapaamuotoiset rivit
 
-      for (const line of lines) {
-        const match = line.match(/^(.+?):\s*(\d+)\s*kcal/i);
-        if (match) {
-          const label = match[1].trim();
-          const kcal = Number(match[2]);
-          estimates.push({ label, kcal });
-          total += kcal;
-        }
-      }
+  for (const line of lines) {
+    if (/:\s*\d+\s*kcal/i.test(line)) {
+      known.push(line);
+    } else {
+      unknown.push(line);
+    }
+  }
 
-      const extraCal = Number(extra.value || 0);
-      total += extraCal;
+  // Näytä latausindikaattori jos tuntemattomia rivejä
+  if (unknown.length > 0) {
+    statusEl.textContent = '🔍 Arvioidaan kaloreita...';
+    calculateBtn.disabled = true;
+  }
 
-      kcalDisplay.textContent = total;
-      kcalDisplay.className = 'kcal-display';
-      kcalUnit.textContent = 'kcal';
+  let allLines = [...known];
 
-      barWrap.style.display = 'block';
-      kcalBar.style.width = Math.min((total / 1000) * 100, 100) + '%';
-      kcalBar.className = 'kcal-bar';
-      if (total < 450) kcalBar.classList.add('light');
-      else if (total > 900) kcalBar.classList.add('heavy');
-
-      comment.textContent = getComment(total, goal.value);
-      breakdown.innerHTML = '';
-
-      estimates.forEach((item, i) => {
-        const div = document.createElement('div');
-        div.className = 'breakdown-item';
-        div.style.animationDelay = (i * 0.05) + 's';
-        div.innerHTML = `<span class="item-name">${item.label}</span><span class="item-kcal">${item.kcal} kcal</span>`;
-        breakdown.appendChild(div);
+  if (unknown.length > 0) {
+    try {
+      const response = await fetch('/api/estimate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: unknown })
       });
+      const data = await response.json();
+      if (data.result) {
+        const estimatedLines = data.result.split('\n').map(s => s.trim()).filter(Boolean);
+        allLines = [...allLines, ...estimatedLines];
+        // Päivitä myös textarea niin käyttäjä näkee mitä Gemini arvioi
+        foods.value = allLines.join('\n');
+      }
+    } catch (err) {
+      console.error(err);
+      statusEl.textContent = '⚠️ Arviointi epäonnistui, tarkista rivit.';
+    } finally {
+      calculateBtn.disabled = false;
+    }
+  }
 
+  // Laske kalorit
+  const estimates = [];
+  let total = 0;
+
+  for (const line of allLines) {
+    const match = line.match(/^(.+?):\s*(\d+)\s*kcal/i);
+    if (match) {
+      const label = match[1].trim();
+      const kcal = Number(match[2]);
+      estimates.push({ label, kcal });
+      total += kcal;
+    }
+  }
+
+  const extraCal = Number(extra.value || 0);
+  total += extraCal;
+
+  kcalDisplay.textContent = total;
+  kcalDisplay.className = 'kcal-display';
+  kcalUnit.textContent = 'kcal';
+  statusEl.textContent = '';
+
+  barWrap.style.display = 'block';
+  kcalBar.style.width = Math.min((total / 1000) * 100, 100) + '%';
+  kcalBar.className = 'kcal-bar';
+  if (total < 450) kcalBar.classList.add('light');
+  else if (total > 900) kcalBar.classList.add('heavy');
+
+  comment.textContent = getComment(total, goal.value);
+  breakdown.innerHTML = '';
+
+  estimates.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'breakdown-item';
+    div.style.animationDelay = (i * 0.05) + 's';
+    div.innerHTML = `<span class="item-name">${item.label}</span><span class="item-kcal">${item.kcal} kcal</span>`;
+    breakdown.appendChild(div);
+  });
+
+  if (extraCal > 0) {
+    const div = document.createElement('div');
+    div.className = 'breakdown-item';
+    div.innerHTML = `<span class="item-name">Lisäkalorit</span><span class="item-kcal">${extraCal} kcal</span>`;
+    breakdown.appendChild(div);
+  }
+
+  updateSteps(3);
+  document.querySelector('.result-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+});
       if (extraCal > 0) {
         const div = document.createElement('div');
         div.className = 'breakdown-item';
