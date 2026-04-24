@@ -215,13 +215,19 @@
       transition: all 0.2s ease;
     }
 
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
     .btn-primary {
       background: var(--accent);
       color: #0d0c09;
       flex: 1;
     }
 
-    .btn-primary:hover {
+    .btn-primary:hover:not(:disabled) {
       background: #fbb53a;
       box-shadow: 0 4px 20px var(--accent-glow);
       transform: translateY(-1px);
@@ -234,7 +240,7 @@
       flex: 1;
     }
 
-    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-secondary:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
 
     .btn-ghost {
       background: transparent;
@@ -493,7 +499,7 @@
 
     <div class="card">
       <div class="card-title"><span class="num">2</span> Tarkista tai muokkaa ruokalista</div>
-      <textarea id="foods" placeholder="Esim. kana 150 g: 248 kcal, riisi 200 g: 260 kcal"></textarea>
+      <textarea id="foods" placeholder="Kirjoita vapaasti, esim: banaani, kaurapuuro 2dl, kahvi maidolla&#10;tai tarkalla muodolla: kana 150 g: 248 kcal, riisi 200 g: 260 kcal"></textarea>
       <div class="pill-grid">
         <div class="pill" data-fill="kana 150 g: 248 kcal, riisi 200 g: 260 kcal, salaatti 80 g: 16 kcal"><span class="emoji">🍗</span> Kana + riisi</div>
         <div class="pill" data-fill="lohi 180 g: 374 kcal, peruna 250 g: 200 kcal, vihannekset 100 g: 35 kcal"><span class="emoji">🐟</span> Lohi + peruna</div>
@@ -631,6 +637,7 @@
       if (!imageLoaded) { statusEl.textContent = '⚠️ Valitse ensin kuva.'; return; }
       try {
         statusEl.textContent = '🔍 Analysoidaan kuvaa...';
+        analyzeBtn.disabled = true;
         const canvas = document.createElement('canvas');
         const maxSize = 800;
         let w = preview.naturalWidth;
@@ -662,6 +669,8 @@
       } catch (err) {
         console.error(err);
         statusEl.textContent = '⚠️ Analyysi epäonnistui.';
+      } finally {
+        analyzeBtn.disabled = false;
       }
     });
 
@@ -672,106 +681,96 @@
     });
 
     calculateBtn.addEventListener('click', async () => {
-  const text = foods.value.trim();
-  if (!text) {
-    kcalDisplay.textContent = '—';
-    kcalDisplay.className = 'kcal-display empty';
-    kcalUnit.textContent = 'Kirjoita ensin ruokalista.';
-    breakdown.innerHTML = '';
-    return;
-  }
-
-  const lines = text.split('\n').flatMap(l => l.split(',')).map(s => s.trim()).filter(Boolean);
-  const known = [];      // rivit joissa jo kcal
-  const unknown = [];    // vapaamuotoiset rivit
-
-  for (const line of lines) {
-    if (/:\s*\d+\s*kcal/i.test(line)) {
-      known.push(line);
-    } else {
-      unknown.push(line);
-    }
-  }
-
-  // Näytä latausindikaattori jos tuntemattomia rivejä
-  if (unknown.length > 0) {
-    statusEl.textContent = '🔍 Arvioidaan kaloreita...';
-    calculateBtn.disabled = true;
-  }
-
-  let allLines = [...known];
-
-  if (unknown.length > 0) {
-    try {
-      const response = await fetch('/api/estimate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: unknown })
-      });
-      const data = await response.json();
-      if (data.result) {
-        const estimatedLines = data.result.split('\n').map(s => s.trim()).filter(Boolean);
-        allLines = [...allLines, ...estimatedLines];
-        // Päivitä myös textarea niin käyttäjä näkee mitä Gemini arvioi
-        foods.value = allLines.join('\n');
+      const text = foods.value.trim();
+      if (!text) {
+        kcalDisplay.textContent = '—';
+        kcalDisplay.className = 'kcal-display empty';
+        kcalUnit.textContent = 'Kirjoita ensin ruokalista.';
+        breakdown.innerHTML = '';
+        return;
       }
-    } catch (err) {
-      console.error(err);
-      statusEl.textContent = '⚠️ Arviointi epäonnistui, tarkista rivit.';
-    } finally {
-      calculateBtn.disabled = false;
-    }
-  }
 
-  // Laske kalorit
-  const estimates = [];
-  let total = 0;
+      const lines = text.split('\n').flatMap(l => l.split(',')).map(s => s.trim()).filter(Boolean);
+      const known = [];    // rivit joissa jo kcal-arvo
+      const unknown = []; // vapaamuotoiset rivit
 
-  for (const line of allLines) {
-    const match = line.match(/^(.+?):\s*(\d+)\s*kcal/i);
-    if (match) {
-      const label = match[1].trim();
-      const kcal = Number(match[2]);
-      estimates.push({ label, kcal });
-      total += kcal;
-    }
-  }
+      for (const line of lines) {
+        if (/:\s*\d+\s*kcal/i.test(line)) {
+          known.push(line);
+        } else {
+          unknown.push(line);
+        }
+      }
 
-  const extraCal = Number(extra.value || 0);
-  total += extraCal;
+      // Jos tuntemattomia rivejä, lähetä Geminille arvioitavaksi
+      if (unknown.length > 0) {
+        statusEl.textContent = '🔍 Arvioidaan kaloreita...';
+        calculateBtn.disabled = true;
 
-  kcalDisplay.textContent = total;
-  kcalDisplay.className = 'kcal-display';
-  kcalUnit.textContent = 'kcal';
-  statusEl.textContent = '';
+        try {
+          const response = await fetch('/api/estimate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items: unknown })
+          });
+          const data = await response.json();
+          if (data.result) {
+            const estimatedLines = data.result.split('\n').map(s => s.trim()).filter(Boolean);
+            const allLines = [...known, ...estimatedLines];
+            // Päivitä textarea näyttämään Geminin arviot
+            foods.value = allLines.join('\n');
+            statusEl.textContent = '✓ Kalorit arvioitu.';
+          } else {
+            statusEl.textContent = '⚠️ Arviointi epäonnistui, tarkista rivit.';
+          }
+        } catch (err) {
+          console.error(err);
+          statusEl.textContent = '⚠️ Arviointi epäonnistui.';
+        } finally {
+          calculateBtn.disabled = false;
+        }
+      }
 
-  barWrap.style.display = 'block';
-  kcalBar.style.width = Math.min((total / 1000) * 100, 100) + '%';
-  kcalBar.className = 'kcal-bar';
-  if (total < 450) kcalBar.classList.add('light');
-  else if (total > 900) kcalBar.classList.add('heavy');
+      // Laske kalorit päivitetystä tekstistä
+      const finalLines = foods.value.split('\n').flatMap(l => l.split(',')).map(s => s.trim()).filter(Boolean);
+      const estimates = [];
+      let total = 0;
 
-  comment.textContent = getComment(total, goal.value);
-  breakdown.innerHTML = '';
+      for (const line of finalLines) {
+        const match = line.match(/^(.+?):\s*(\d+)\s*kcal/i);
+        if (match) {
+          const label = match[1].trim();
+          const kcal = Number(match[2]);
+          estimates.push({ label, kcal });
+          total += kcal;
+        }
+      }
 
-  estimates.forEach((item, i) => {
-    const div = document.createElement('div');
-    div.className = 'breakdown-item';
-    div.style.animationDelay = (i * 0.05) + 's';
-    div.innerHTML = `<span class="item-name">${item.label}</span><span class="item-kcal">${item.kcal} kcal</span>`;
-    breakdown.appendChild(div);
-  });
+      const extraCal = Number(extra.value || 0);
+      total += extraCal;
 
-  if (extraCal > 0) {
-    const div = document.createElement('div');
-    div.className = 'breakdown-item';
-    div.innerHTML = `<span class="item-name">Lisäkalorit</span><span class="item-kcal">${extraCal} kcal</span>`;
-    breakdown.appendChild(div);
-  }
+      kcalDisplay.textContent = total;
+      kcalDisplay.className = 'kcal-display';
+      kcalUnit.textContent = 'kcal';
+      if (unknown.length === 0) statusEl.textContent = '';
 
-  updateSteps(3);
-  document.querySelector('.result-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-});
+      barWrap.style.display = 'block';
+      kcalBar.style.width = Math.min((total / 1000) * 100, 100) + '%';
+      kcalBar.className = 'kcal-bar';
+      if (total < 450) kcalBar.classList.add('light');
+      else if (total > 900) kcalBar.classList.add('heavy');
+
+      comment.textContent = getComment(total, goal.value);
+      breakdown.innerHTML = '';
+
+      estimates.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = 'breakdown-item';
+        div.style.animationDelay = (i * 0.05) + 's';
+        div.innerHTML = `<span class="item-name">${item.label}</span><span class="item-kcal">${item.kcal} kcal</span>`;
+        breakdown.appendChild(div);
+      });
+
       if (extraCal > 0) {
         const div = document.createElement('div');
         div.className = 'breakdown-item';
