@@ -682,11 +682,14 @@
         // Yritä pakata Canvas API:lla
         let imageToSend = await compressImage(preview, 800, 0.7);
 
-        // Jos Canvas epäonnistui, käytä alkuperäistä kuvaa
-        if (!imageToSend) {
-          console.warn('Canvas failed, using original image');
-          imageToSend = originalFileDataUrl;
-        }
+       // Jos Canvas epäonnistui, käytä alkuperäistä kuvaa
+if (!imageToSend) {
+  console.warn('Canvas failed, using original image');
+  imageToSend = originalFileDataUrl;
+}
+
+// VÄLIAIKAINEN DEBUG - poistetaan myöhemmin
+alert('Kuva OK: ' + (imageToSend ? 'kyllä, pituus: ' + imageToSend.length : 'EI'));
 
         // Jos alkuperäinenkin puuttuu, hätäratkaisu
         if (!imageToSend) {
