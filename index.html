@@ -689,7 +689,6 @@ if (!imageToSend) {
 }
 
 // VÄLIAIKAINEN DEBUG - poistetaan myöhemmin
-alert('Kuva OK: ' + (imageToSend ? 'kyllä, pituus: ' + imageToSend.length : 'EI'));
 
         // Jos alkuperäinenkin puuttuu, hätäratkaisu
         if (!imageToSend) {
@@ -698,7 +697,8 @@ alert('Kuva OK: ' + (imageToSend ? 'kyllä, pituus: ' + imageToSend.length : 'EI
           return;
         }
 
-        const response = await fetch('/api/analyze', {
+        await new Promise(resolve => setTimeout(resolve, 300));
+const response = await fetch('/api/analyze', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ image: imageToSend })
